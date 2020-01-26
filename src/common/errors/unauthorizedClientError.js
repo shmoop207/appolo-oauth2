@@ -10,4 +10,4 @@ class UnauthorizedClientError extends Error {
     }
 }
 exports.UnauthorizedClientError = UnauthorizedClientError;
-//# sourceMappingURL=UnauthorizedClientError.js.map
+//# sourceMappingURL=unauthorizedClientError.js.map

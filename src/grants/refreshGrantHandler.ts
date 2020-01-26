@@ -7,24 +7,28 @@ import {TokensHelper} from "../tokens/tokensHelper";
 import {IRefreshToken, IToken} from "../interfaces/IToken";
 import {IGrantHandler, IGrantParams} from "../interfaces/IGrantHandler";
 import {Promises} from "appolo-utils";
+import {GrantType} from "../common/enums";
+import {IClient} from "../interfaces/IClient";
 
 @define()
 @singleton()
 @alias("IGrantHandler")
 export class RefreshGrantHandler implements IGrantHandler {
 
-    @inject() moduleOptions: IOptions;
-    @inject() baseGrantHandler: TokensHelper;
+    @inject() options: IOptions;
+    @inject() tokensHelper: TokensHelper;
+
+    public TYPE = GrantType.RefreshToken;
 
     public async handle(params: IGrantParams): Promise<IToken> {
 
         let refreshToken = await this._getRefreshToken(params.refreshToken);
 
-        this._validateToken(refreshToken);
+        this._validateToken(refreshToken, params.client);
 
-        await this.baseGrantHandler.revokeRefreshToken(refreshToken);
+        await this.tokensHelper.revokeRefreshToken(refreshToken);
 
-        let token = await this.baseGrantHandler.createTokens({
+        let token = await this.tokensHelper.createTokens({
             scopes: refreshToken.scope,
             client: params.client,
             user: refreshToken.user
@@ -33,7 +37,7 @@ export class RefreshGrantHandler implements IGrantHandler {
         return token;
     }
 
-    private _validateToken(token: IRefreshToken) {
+    private _validateToken(token: IRefreshToken, client: IClient) {
 
 
         if (!token.client) {
@@ -44,7 +48,7 @@ export class RefreshGrantHandler implements IGrantHandler {
             throw new ServerError('Server error: `getRefreshToken()` did not return a `user`');
         }
 
-        if (token.client.id !== token.id) {
+        if (token.client.id !== client.id) {
             throw new InvalidGrantError('Invalid grant: refresh token is invalid');
         }
 
@@ -57,13 +61,13 @@ export class RefreshGrantHandler implements IGrantHandler {
         }
     }
 
-    private async _getRefreshToken(token: string):Promise<IRefreshToken> {
+    private async _getRefreshToken(token: string): Promise<IRefreshToken> {
 
-        let promise = (this.moduleOptions.model as IRefreshTokenModel).getRefreshToken(token);
+        let promise = (this.options.model as IRefreshTokenModel).getRefreshToken(token);
 
-        let [err,refreshToken] = await Promises.to(promise);
+        let [err, refreshToken] = await Promises.to(promise);
 
-        if(err){
+        if (err) {
             throw new ServerError(`server error: ${(err || "").toString()}`)
         }
 

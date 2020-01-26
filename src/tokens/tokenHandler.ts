@@ -13,7 +13,7 @@ import {TokensHelper} from "./tokensHelper";
 @singleton()
 export class TokenHandler {
 
-    @inject() moduleOptions: IOptions;
+    @inject() options: IOptions;
     @inject() clientHandler: ClientHandler;
     @inject() grantCheck: GrantCheck;
     @inject() authenticateHandler: AuthenticateHandler;

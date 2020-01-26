@@ -10,4 +10,4 @@ class InvalidClientError extends Error {
     }
 }
 exports.InvalidClientError = InvalidClientError;
-//# sourceMappingURL=InvalidClientError.js.map
+//# sourceMappingURL=invalidClientError.js.map

@@ -10,4 +10,4 @@ class InvalidGrantError extends Error {
     }
 }
 exports.InvalidGrantError = InvalidGrantError;
-//# sourceMappingURL=InvalidGrantError.js.map
+//# sourceMappingURL=invalidGrantError.js.map

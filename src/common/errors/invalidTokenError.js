@@ -10,4 +10,4 @@ class InvalidTokenError extends Error {
     }
 }
 exports.InvalidTokenError = InvalidTokenError;
-//# sourceMappingURL=InvalidTokenError.js.map
+//# sourceMappingURL=invalidTokenError.js.map

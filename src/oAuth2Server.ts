@@ -8,7 +8,7 @@ import {TokenHandler} from "./tokens/tokenHandler";
 import {AuthenticateHandler} from "./auth/authenticateHandler";
 
 @define()
-export class OAuth2Server extends EventDispatcher {
+export class OAuth2Server {
 
     @inject() private tokenHandler: TokenHandler;
     @inject() private authenticateHandler: AuthenticateHandler;
@@ -26,7 +26,7 @@ export class OAuth2Server extends EventDispatcher {
         return this.tokenHandler.createToken(params)
     }
 
-    public revokeToken(token:string):Promise<void>{
+    public revokeToken(token: string): Promise<void> {
         return this.tokenHandler.revokeToken(token)
     }
 }

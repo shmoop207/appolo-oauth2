@@ -1,126 +1,342 @@
 import chai = require('chai');
 import sinon = require('sinon');
 import    sinonChai = require("sinon-chai");
-import {createRabbit, Message, Rabbit} from "../index";
+import {
+    createOAuth2Server,
+    OAuth2Server,
+    IRefreshTokenModel,
+    IPasswordModel,
+    IAuthenticationModel,
+    IClient, Falsey, IUser, IToken, GrantType, Utils
+} from "../index";
 import {Promises} from "appolo-utils";
+import {TestModel} from "./testModel";
 
 let should = require('chai').should();
 chai.use(sinonChai);
 
 
-describe("bus module Spec", function () {
-    let rabbit: Rabbit;
+describe("OAuth2Server Spec", function () {
+
+    let server: OAuth2Server;
+
 
     beforeEach(async () => {
-        rabbit = await createRabbit({
-            connection: {
-                uri: process.env.RABBIT
-            },
-            exchanges: [{persistent: true, name: "test", type: "topic", autoDelete: true, durable: true}],
-            queues: [{name: "test"}],
-            requestQueues: [{name: "request"}],
-            bindings: [{exchange: "test", queue: "test", keys: ["aa.bb.cc"]}, {
-                exchange: "test",
-                queue: "request",
-                keys: ["request.#"]
-            }],
-            replyQueue: {name: "reply"}
-        });
+        server = await createOAuth2Server({scopes: ["scopeTest"], model: new TestModel()})
+
     });
 
     afterEach(async () => {
-        await rabbit.close()
-    });
-
-    it("should connect", async () => {
-
-        await rabbit.connect();
-
-        let worked = false;
-
-        rabbit.handle("aa.bb.cc", async (msg: Message<any>) => {
-            worked = true;
-            msg.ack();
-        });
-
-        await rabbit.subscribe();
-
-        await rabbit.publish("test", {routingKey: "aa.bb.cc", body: {working: true}});
-
-        await Promises.delay(3000);
-
-        worked.should.be.ok;
 
     });
 
+    it("should get token", async () => {
 
-    it("should reconnect connect", async () => {
-
-        await rabbit.connect();
-
-        let worked = false;
-
-        rabbit.handle("aa.bb.cc", async (msg: Message<any>) => {
-            worked = true;
-            msg.ack();
+        let token = await server.token({
+            grantType: GrantType.Password,
+            scope: ["scopeTest"],
+            clientId: "aa",
+            clientSecret: "bb",
+            username: "ccc",
+            password: "ddd"
         });
 
-        await rabbit.subscribe();
-        await rabbit.reconnect();
 
-        await rabbit.publish("test", {routingKey: "aa.bb.cc", body: {working: true}});
+        token.accessToken.should.be.ok;
+        token.accessTokenExpiresAt.should.be.ok;
+        token.refreshTokenExpiresAt.should.be.ok;
+        token.refreshToken.should.be.ok;
+        token.client.id.should.be.be.eq("111");
+        token.scope[0].should.be.eq("scopeTest");
+        token.user.userName.should.be.eq("test");
 
-        await Promises.delay(3000);
-
-        worked.should.be.ok;
+        (new Date(token.refreshTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gt(7000000);
+        (new Date(token.accessTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gt(3500000);
 
     });
 
-    it("should replay", async () => {
+    it("should throw invalid client", async () => {
 
-        rabbit.handle("request.aaaaa.bbbb", (msg: Message<{ counter: number }>) => {
-            msg.replyResolve({counter: msg.body.counter + 2});
-        })
-
-        await rabbit.connect();
-
-        await rabbit.subscribe();
-
-        let result = await rabbit.request<{ counter: number }>("test", {
-            routingKey: "request.aaaaa.bbbb",
-            body: {counter: 1}
-        });
-
-        result.counter.should.be.eq(3)
-
+        try {
+            let token = await server.token({
+                grantType: GrantType.Password,
+                scope: ["scopeTest"],
+                clientId: "aaa",
+                clientSecret: "bb",
+                username: "ccc",
+                password: "ddd"
+            });
+            token.should.not.be.ok;
+        } catch (e) {
+            e.should.be.ok;
+            e.name.should.be.eq("invalid_client");
+            e.code.should.be.eq(400);
+        }
     });
 
-    it("should replay stream", async () => {
+    it("should throw invalid password", async () => {
 
+        try {
+            let token = await server.token({
+                grantType: GrantType.Password,
+                scope: ["scopeTest"],
+                clientId: "aa",
+                clientSecret: "bb",
+                username: "ccc",
+                password: "dddc"
+            });
+            token.should.not.be.ok;
+        } catch (e) {
+            e.should.be.ok;
+            e.name.should.be.eq("invalid_grant");
+            e.message.should.be.eq("Invalid grant: user credentials are invalid");
+            e.code.should.be.eq(400);
+        }
+    });
 
-        rabbit.handle("request.aaaaa.ccc", (msg: Message<{ counter: number }>) => {
-            msg.stream.write(Buffer.from(JSON.stringify({counter: msg.body.counter + 1})));
-            msg.stream.write(Buffer.from(JSON.stringify({counter: msg.body.counter + 2})));
-            msg.stream.end();
+    it("should throw scope password", async () => {
+
+        try {
+            let token = await server.token({
+                grantType: GrantType.Password,
+                scope: ["scopeTest2"],
+                clientId: "aa",
+                clientSecret: "bb",
+                username: "ccc",
+                password: "ddd"
+            });
+            token.should.not.be.ok;
+        } catch (e) {
+            e.should.be.ok;
+            e.name.should.be.eq("invalid_scope");
+            e.message.should.be.eq("Invalid scope: Requested scope is invalid");
+            e.code.should.be.eq(400);
+        }
+    });
+
+    it("should throw invalid grant type password", async () => {
+
+        try {
+            let token = await server.token({
+                grantType: "aaa" as any,
+                scope: ["scopeTest2"],
+                clientId: "aa",
+                clientSecret: "bb",
+                username: "ccc",
+                password: "ddd"
+            });
+            token.should.not.be.ok;
+        } catch (e) {
+            e.should.be.ok;
+            e.name.should.be.eq("invalid_request");
+            e.message.should.be.eq("Unsupported grant type: `grant_type` is invalid");
+            e.code.should.be.eq(400);
+        }
+    });
+
+    it("should get token", async () => {
+
+        let token = await server.token({
+            grantType: GrantType.Password,
+            scope: ["scopeTest"],
+            clientId: "aa",
+            clientSecret: "bb",
+            username: "ccc",
+            password: "ddd"
         });
 
-        await rabbit.connect();
+        token.should.be.ok;
 
-        await rabbit.subscribe();
+        let tokenResult = await server.authenticate(token.accessToken);
 
-        let result = await rabbit.requestStream<{ counter: number }>("test", {
-            routingKey: "request.aaaaa.ccc",
-            body: {counter: 1}
-        });
+        tokenResult.should.be.ok;
 
+        tokenResult.should.be.eq(token)
+    });
 
-        let sum = 0;
+    it("should throw expire token", async () => {
+        let clock;
+        try {
+            let token = await server.token({
+                grantType: GrantType.Password,
+                scope: ["scopeTest"],
+                clientId: "aa",
+                clientSecret: "bb",
+                username: "ccc",
+                password: "ddd"
+            });
 
-        for await (const chunk of result) {
-            sum += JSON.parse(chunk).counter
+            token.should.be.ok;
+
+            let now = new Date();
+
+            now.setSeconds(now.getSeconds() + (60 * 60) + 100);
+
+            clock = sinon.useFakeTimers({
+                now: now,
+                shouldAdvanceTime: true,
+
+            });
+
+            let tokenResult = await server.authenticate(token.accessToken);
+
+            tokenResult.should.not.be.ok;
+
+        } catch (e) {
+            e.should.be.ok;
+            e.name.should.be.eq("invalid_token");
+            e.message.should.be.eq("Invalid token: access token has expired");
+            e.code.should.be.eq(401);
         }
 
-        sum.should.be.eq(5);
+        clock.restore();
+    });
+
+    it("should throw invalid token", async () => {
+
+        try {
+            let token = await server.token({
+                grantType: GrantType.Password,
+                scope: ["scopeTest"],
+                clientId: "aa",
+                clientSecret: "bb",
+                username: "ccc",
+                password: "ddd"
+            });
+
+            token.should.be.ok;
+
+            let tokenResult = await server.authenticate(token.accessToken + "11");
+
+            tokenResult.should.not.be.ok;
+
+        } catch (e) {
+            e.should.be.ok;
+            e.name.should.be.eq("invalid_token");
+            e.message.should.be.eq("Invalid token: access token is invalid");
+            e.code.should.be.eq(401);
+        }
+    });
+
+    it("should get refresh token", async () => {
+
+        let token = await server.token({
+            grantType: GrantType.Password,
+            scope: ["scopeTest"],
+            clientId: "aa",
+            clientSecret: "bb",
+            username: "ccc",
+            password: "ddd"
+        });
+
+        token.should.be.ok;
+
+        let tokenResult = await server.token({
+            grantType: GrantType.RefreshToken,
+            scope: ["scopeTest"],
+            clientId: "aa",
+            clientSecret: "bb",
+            refreshToken: token.refreshToken
+        });
+
+        tokenResult.accessToken.should.be.ok;
+        tokenResult.accessToken.should.not.be.eq(token.accessToken);
+        tokenResult.accessTokenExpiresAt.should.be.ok;
+        tokenResult.refreshTokenExpiresAt.should.be.ok;
+        tokenResult.refreshToken.should.be.ok;
+        tokenResult.client.id.should.be.be.eq("111");
+        tokenResult.scope[0].should.be.eq("scopeTest");
+        tokenResult.user.userName.should.be.eq("test");
+
+        (new Date(tokenResult.refreshTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gt(7000000);
+        (new Date(tokenResult.accessTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gt(3500000);
+    });
+
+    it("should throw expire refresh token", async () => {
+        let clock;
+        try {
+
+            let token = await server.token({
+                grantType: GrantType.Password,
+                scope: ["scopeTest"],
+                clientId: "aa",
+                clientSecret: "bb",
+                username: "ccc",
+                password: "ddd"
+            });
+
+            token.should.be.ok;
+
+            let now = new Date();
+
+            now.setSeconds(now.getSeconds() + (60 * 60 * 2) + 100);
+
+            clock = sinon.useFakeTimers({
+                now: now,
+                shouldAdvanceTime: true,
+
+            });
+
+            let tokenResult = await server.token({
+                grantType: GrantType.RefreshToken,
+                scope: ["scopeTest"],
+                clientId: "aa",
+                clientSecret: "bb",
+                refreshToken: token.refreshToken
+            });
+
+            tokenResult.should.not.be.ok;
+
+
+        } catch (e) {
+            e.should.be.ok;
+            e.name.should.be.eq("invalid_grant");
+            e.message.should.be.eq("Invalid grant: refresh token has expired");
+            e.code.should.be.eq(400);
+        }
+        clock.restore()
+    });
+
+    it("should throw invalid refresh token", async () => {
+
+        try {
+
+            let token = await server.token({
+                grantType: GrantType.Password,
+                scope: ["scopeTest"],
+                clientId: "aa",
+                clientSecret: "bb",
+                username: "ccc",
+                password: "ddd"
+            });
+
+            token.should.be.ok;
+
+            let tokenResult = await server.token({
+                grantType: GrantType.RefreshToken,
+                scope: ["scopeTest"],
+                clientId: "aa",
+                clientSecret: "bb",
+                refreshToken: token.refreshToken+"11"
+            });
+
+            tokenResult.should.not.be.ok;
+
+
+        } catch (e) {
+            e.should.be.ok;
+            e.name.should.be.eq("invalid_grant");
+            e.message.should.be.eq("Invalid grant: refresh token is invalid");
+            e.code.should.be.eq(400);
+        }
+
+    });
+
+    it("should parse Authorization", async () => {
+        let {name,pass} = Utils.parseAuthorization("Basic YWFhYTpGeTlRZlhoUFhXQWNNYVdQ");
+
+        name.should.be.eq("aaaa")
+        pass.should.be.eq("Fy9QfXhPXWAcMaWP")
     })
 
 

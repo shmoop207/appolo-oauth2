@@ -2,7 +2,7 @@ import {IClient} from "./IClient";
 import {IUser} from "./IUser";
 import {IRefreshToken, IToken} from "./IToken";
 
-type Falsey = '' | 0 | false | null | undefined;
+export type Falsey = '' | 0 | false | null | undefined;
 
 
 export interface IBaseModel {
@@ -42,6 +42,9 @@ export interface IRefreshTokenModel extends IBaseModel {
     revokeRefreshToken(token: IRefreshToken): Promise<boolean>;
 
     saveRefreshToken(token: IRefreshToken, client: IClient, user: IUser): Promise<IRefreshToken | Falsey>;
+
+    validateScope?(user: IUser, client: IClient, scope: string[]): Promise<string[] | Falsey>;
+
 
 
 }

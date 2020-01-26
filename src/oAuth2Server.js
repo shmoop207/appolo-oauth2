@@ -2,8 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
 const appolo_engine_1 = require("appolo-engine");
-const appolo_event_dispatcher_1 = require("appolo-event-dispatcher");
-let OAuth2Server = class OAuth2Server extends appolo_event_dispatcher_1.EventDispatcher {
+let OAuth2Server = class OAuth2Server {
     _initialize() {
     }
     authenticate(token) {

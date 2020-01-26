@@ -5,7 +5,7 @@ import {IClient} from "../interfaces/IClient";
 import {IOptions} from "../interfaces/IOptions";
 import {InvalidClientError} from "../common/errors/invalidClientError";
 import {InvalidRequestError} from "../common/errors/invalidRequestError";
-import {ServerError2} from "../common/errors/ServerError";
+import {ServerError} from "../common/errors/serverError";
 import {GrantType} from "../common/enums";
 import {IBaseModel} from "../interfaces/IModel";
 
@@ -13,7 +13,7 @@ import {IBaseModel} from "../interfaces/IModel";
 @singleton()
 export class ClientHandler {
 
-    @inject() moduleOptions: IOptions;
+    @inject() options: IOptions;
 
     public async getClient(params: { clientId: string, clientSecret: string}): Promise<IClient> {
 
@@ -32,7 +32,7 @@ export class ClientHandler {
 
     private async _getClientFromModel(clientId: string, clientSecret: string) {
         try {
-            let client = await (this.moduleOptions.model as IBaseModel).getClient(clientId, clientSecret);
+            let client = await (this.options.model as IBaseModel).getClient(clientId, clientSecret);
 
             return client;
         } catch (e) {

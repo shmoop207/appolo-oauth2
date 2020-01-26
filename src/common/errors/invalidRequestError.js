@@ -10,4 +10,4 @@ class InvalidRequestError extends Error {
     }
 }
 exports.InvalidRequestError = InvalidRequestError;
-//# sourceMappingURL=InvalidRequestError.js.map
+//# sourceMappingURL=invalidRequestError.js.map

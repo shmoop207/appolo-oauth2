@@ -1,19 +1,23 @@
-import {define, inject, singleton} from "appolo-engine";
-import {ICreateTokenParams} from "../interfaces/ICreateTokenParams";
-import {IToken} from "../interfaces/IToken";
+import {define, inject, singleton, initMethod} from "appolo-engine";
 import {IClient} from "../interfaces/IClient";
-import {IOptions} from "../interfaces/IOptions";
-import {InvalidClientError} from "../common/errors/invalidClientError";
 import {InvalidRequestError} from "../common/errors/invalidRequestError";
 import {ServerError} from "../common/errors/serverError";
 import {GrantType} from "../common/enums";
+import {Enums, Arrays} from "appolo-utils";
 import {UnauthorizedClientError} from "../common/errors/unauthorizedClientError";
 
 @define()
 @singleton()
 export class GrantCheck {
 
-    public  checkGrant(params: { client: IClient, grantType: GrantType, scope: string[] }): void {
+    private _grantTypes: { [index in GrantType]?: string } = {};
+
+    @initMethod()
+    private _initialize() {
+        this._grantTypes = Arrays.keyBy<any>(Enums.enumValues(GrantType), (item) => item);
+    }
+
+    public checkGrant(params: { client: IClient, grantType: GrantType, scope: string[] }): void {
 
         let {client} = params;
 
@@ -21,7 +25,7 @@ export class GrantCheck {
             throw new InvalidRequestError("Invalid params: grant_type` is invalid");
         }
 
-        if (!GrantType[params.grantType]) {
+        if (!this._grantTypes[params.grantType]) {
             throw new InvalidRequestError('Unsupported grant type: `grant_type` is invalid');
         }
 

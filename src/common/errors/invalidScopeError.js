@@ -10,4 +10,4 @@ class InvalidScopeError extends Error {
     }
 }
 exports.InvalidScopeError = InvalidScopeError;
-//# sourceMappingURL=InvalidScopeError.js.map
+//# sourceMappingURL=invalidScopeError.js.map

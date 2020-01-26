@@ -12,7 +12,7 @@ import {InsufficientScopeError} from "../common/errors/insufficientScopeError";
 @singleton()
 export class AuthenticateHandler {
 
-    @inject() private moduleOptions: IOptions;
+    @inject() private options: IOptions;
 
     public async getToken(opts: { token: string }): Promise<IToken> {
 
@@ -32,7 +32,7 @@ export class AuthenticateHandler {
 
     private async _getToken(token: string): Promise<IToken> {
 
-        let promise = (this.moduleOptions.model as IAuthenticationModel).getAccessToken(token);
+        let promise = (this.options.model as IAuthenticationModel).getAccessToken(token);
 
         let [err, accessToken] = await Promises.to(promise);
 
@@ -50,11 +50,11 @@ export class AuthenticateHandler {
 
     private async _verifyScope(token: IToken) {
 
-        if (!this.moduleOptions.scopes || !this.moduleOptions.scopes.length) {
+        if (!this.options.scopes || !this.options.scopes.length) {
             return
         }
 
-        let promise = (this.moduleOptions.model as IAuthenticationModel).verifyScope(token, this.moduleOptions.scopes);
+        let promise = (this.options.model as IAuthenticationModel).verifyScope(token, this.options.scopes);
 
         let [err, result] = await Promises.to(promise);
 

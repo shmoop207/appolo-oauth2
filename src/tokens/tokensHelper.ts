@@ -13,11 +13,11 @@ import {InvalidGrantError} from "../common/errors/invalidGrantError";
 @singleton()
 export class TokensHelper {
 
-    @inject() private moduleOptions: IOptions;
+    @inject() private options: IOptions;
 
     public async generateAccessToken(opts: { client: IClient, user: IUser, scopes: string[] }): Promise<string> {
 
-        let token, model = this.moduleOptions.model as IPasswordModel;
+        let token, model = this.options.model as IPasswordModel;
 
         if (model.generateAccessToken) {
             token = await model.generateAccessToken(opts.client, opts.user, opts.scopes)
@@ -28,7 +28,7 @@ export class TokensHelper {
 
     public async generateRefreshToken(opts: { client: IClient, user: IUser, scopes: string[] }): Promise<string> {
 
-        let token, model = this.moduleOptions.model as IRefreshTokenModel;
+        let token, model = this.options.model as IRefreshTokenModel;
 
         if (model.generateRefreshToken) {
             token = await model.generateRefreshToken(opts.client, opts.user, opts.scopes)
@@ -38,14 +38,14 @@ export class TokensHelper {
     }
 
     public getAccessTokenExpiresAt(client: IClient): Date {
-        let tokenLifeTime = (client.accessTokenLifetime || this.moduleOptions.accessTokenLifetime);
+        let tokenLifeTime = (client.accessTokenLifetime || this.options.accessTokenLifetime);
 
         return this._getExpireDate(tokenLifeTime);
     }
 
     public getRefreshTokenExpiresAt(client: IClient): Date {
 
-        let tokenLifeTime = (client.refreshTokenLifetime || this.moduleOptions.refreshTokenLifetime);
+        let tokenLifeTime = (client.refreshTokenLifetime || this.options.refreshTokenLifetime);
 
         return this._getExpireDate(tokenLifeTime);
     }
@@ -63,17 +63,17 @@ export class TokensHelper {
 
         let [token, refreshToken] = await Promise.all([
             this._createAccessToken(opts),
-            this.moduleOptions.useRefreshToken && this.createRefreshToken(opts)]);
+            this.options.useRefreshToken && this.createRefreshToken(opts)]);
 
 
-        if (this.moduleOptions.useRefreshToken) {
+        if (this.options.useRefreshToken) {
             token.refreshTokenExpiresAt = refreshToken.refreshTokenExpiresAt;
             token.refreshToken = refreshToken.refreshToken;
         }
 
         [token, refreshToken] = await Promise.all([
             this.saveToken(token as IToken, opts.client, opts.user),
-            this.moduleOptions.useRefreshToken && this.saveTokenRefresh(refreshToken as IRefreshToken, opts.client, opts.user)]);
+            this.options.useRefreshToken && this.saveTokenRefresh(refreshToken as IRefreshToken, opts.client, opts.user)]);
 
 
         return token as IToken;
@@ -111,7 +111,7 @@ export class TokensHelper {
 
     public async saveToken(token: IToken, client: IClient, user: IUser):Promise<IToken> {
 
-        let promise = (this.moduleOptions.model as IPasswordModel).saveToken(token, client, user);
+        let promise = (this.options.model as IPasswordModel).saveToken(token, client, user);
 
         let [err, validToken] = await Promises.to(promise);
 
@@ -129,7 +129,7 @@ export class TokensHelper {
 
     public async saveTokenRefresh(token: IRefreshToken, client: IClient, user: IUser):Promise<IRefreshToken> {
 
-        let promise = (this.moduleOptions.model as IRefreshTokenModel).saveRefreshToken(token, client, user);
+        let promise = (this.options.model as IRefreshTokenModel).saveRefreshToken(token, client, user);
 
         let [err, validToken] = await Promises.to(promise);
 
@@ -145,7 +145,7 @@ export class TokensHelper {
     }
 
     public async revokeRefreshToken(token:IRefreshToken){
-        let model = this.moduleOptions.model as IRefreshTokenModel;
+        let model = this.options.model as IRefreshTokenModel;
 
         let promise = model.revokeRefreshToken(token);
 
@@ -161,7 +161,7 @@ export class TokensHelper {
     }
 
     public async revokeToken(token:IToken){
-        let model = this.moduleOptions.model as IPasswordModel;
+        let model = this.options.model as IPasswordModel;
 
         let promise = model.revokeToken(token);
 
@@ -175,4 +175,5 @@ export class TokensHelper {
             throw new InvalidGrantError('Invalid grant: failed to token');
         }
     }
+
 }

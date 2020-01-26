@@ -1,4 +1,4 @@
 export enum GrantType {
-    password = "password",
-    refreshToken = "refreshToken"
+    Password = "password",
+    RefreshToken = "refreshToken"
 }

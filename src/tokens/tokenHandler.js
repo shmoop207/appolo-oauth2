@@ -21,7 +21,7 @@ let TokenHandler = class TokenHandler {
 };
 tslib_1.__decorate([
     appolo_engine_1.inject()
-], TokenHandler.prototype, "moduleOptions", void 0);
+], TokenHandler.prototype, "options", void 0);
 tslib_1.__decorate([
     appolo_engine_1.inject()
 ], TokenHandler.prototype, "clientHandler", void 0);

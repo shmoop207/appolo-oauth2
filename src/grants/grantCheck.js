@@ -5,14 +5,21 @@ const appolo_engine_1 = require("appolo-engine");
 const invalidRequestError_1 = require("../common/errors/invalidRequestError");
 const serverError_1 = require("../common/errors/serverError");
 const enums_1 = require("../common/enums");
+const appolo_utils_1 = require("appolo-utils");
 const unauthorizedClientError_1 = require("../common/errors/unauthorizedClientError");
 let GrantCheck = class GrantCheck {
+    constructor() {
+        this._grantTypes = {};
+    }
+    _initialize() {
+        this._grantTypes = appolo_utils_1.Arrays.keyBy(appolo_utils_1.Enums.enumValues(enums_1.GrantType), (item) => item);
+    }
     checkGrant(params) {
         let { client } = params;
         if (!params.grantType) {
             throw new invalidRequestError_1.InvalidRequestError("Invalid params: grant_type` is invalid");
         }
-        if (!enums_1.GrantType[params.grantType]) {
+        if (!this._grantTypes[params.grantType]) {
             throw new invalidRequestError_1.InvalidRequestError('Unsupported grant type: `grant_type` is invalid');
         }
         if (!client.grants || !Array.isArray(client.grants)) {
@@ -26,6 +33,9 @@ let GrantCheck = class GrantCheck {
         }
     }
 };
+tslib_1.__decorate([
+    appolo_engine_1.initMethod()
+], GrantCheck.prototype, "_initialize", null);
 GrantCheck = tslib_1.__decorate([
     appolo_engine_1.define(),
     appolo_engine_1.singleton()

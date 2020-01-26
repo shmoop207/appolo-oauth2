@@ -1,5 +1,6 @@
 import {IToken} from "./IToken";
 import {IClient} from "./IClient";
+import {GrantType} from "../common/enums";
 
 export interface IGrantParams {
     username?: string,
@@ -11,4 +12,6 @@ export interface IGrantParams {
 
 export interface IGrantHandler {
     handle(params: IGrantParams): Promise<IToken>
+
+    TYPE: GrantType
 }

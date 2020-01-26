@@ -11,14 +11,17 @@ import {IUser} from "../interfaces/IUser";
 import {IGrantHandler, IGrantParams} from "../interfaces/IGrantHandler";
 import {InvalidRequestError} from "../common/errors/invalidRequestError";
 import {Promises} from "appolo-utils";
+import {GrantType} from "../common/enums";
 
 @define()
 @singleton()
 @alias("IGrantHandler")
 export class PasswordGruntHandler implements IGrantHandler {
 
-    @inject() moduleOptions: IOptions;
-    @inject() baseGrantHandler: TokensHelper;
+    @inject() options: IOptions;
+    @inject() tokensHelper: TokensHelper;
+
+    public TYPE = GrantType.Password;
 
     public async handle(params: IGrantParams): Promise<IToken> {
 
@@ -27,17 +30,17 @@ export class PasswordGruntHandler implements IGrantHandler {
         }
 
         if (!params.password) {
-            throw new InvalidRequestError('Missing parameter: `password`');
+            throw new InvalidRequestError('Missing parameter: `Password`');
         }
 
         let {client} = params;
 
-        let user = this._getUser(params.username, params.password);
+        let user = await this._getUser(params.username, params.password);
 
         let scopes = await this._validateScope(user, client, params.scope);
 
 
-        let token = await this.baseGrantHandler.createTokens({user, client, scopes});
+        let token = await this.tokensHelper.createTokens({user, client, scopes});
 
         return token;
 
@@ -45,7 +48,7 @@ export class PasswordGruntHandler implements IGrantHandler {
 
     private async _getUser(username: string, password: string) {
 
-        let promise = (this.moduleOptions.model as IPasswordModel).getUser(username, password);
+        let promise = (this.options.model as IPasswordModel).getUser(username, password);
 
         let [err, user] = await Promises.to(promise);
 
@@ -62,7 +65,7 @@ export class PasswordGruntHandler implements IGrantHandler {
 
     private async _validateScope(user: IUser, client: IClient, scopes: string[]):Promise<string[]> {
 
-        let promise  = (this.moduleOptions.model as IPasswordModel).validateScope(user, client, scopes);
+        let promise  = (this.options.model as IPasswordModel).validateScope(user, client, scopes);
 
         let [err,validScopes] = await Promises.to(promise);
 

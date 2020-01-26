@@ -18,7 +18,7 @@ let AuthenticateHandler = class AuthenticateHandler {
         return accessToken;
     }
     async _getToken(token) {
-        let promise = this.moduleOptions.model.getAccessToken(token);
+        let promise = this.options.model.getAccessToken(token);
         let [err, accessToken] = await appolo_utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError('Server error: `failed to get token');
@@ -29,10 +29,10 @@ let AuthenticateHandler = class AuthenticateHandler {
         return accessToken;
     }
     async _verifyScope(token) {
-        if (!this.moduleOptions.scopes || !this.moduleOptions.scopes.length) {
+        if (!this.options.scopes || !this.options.scopes.length) {
             return;
         }
-        let promise = this.moduleOptions.model.verifyScope(token, this.moduleOptions.scopes);
+        let promise = this.options.model.verifyScope(token, this.options.scopes);
         let [err, result] = await appolo_utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError('Server error: `failed to` must be a Date instance');
@@ -52,7 +52,7 @@ let AuthenticateHandler = class AuthenticateHandler {
 };
 tslib_1.__decorate([
     appolo_engine_1.inject()
-], AuthenticateHandler.prototype, "moduleOptions", void 0);
+], AuthenticateHandler.prototype, "options", void 0);
 AuthenticateHandler = tslib_1.__decorate([
     appolo_engine_1.define(),
     appolo_engine_1.singleton()

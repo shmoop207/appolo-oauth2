@@ -17,7 +17,7 @@ let ClientHandler = class ClientHandler {
     }
     async _getClientFromModel(clientId, clientSecret) {
         try {
-            let client = await this.moduleOptions.model.getClient(clientId, clientSecret);
+            let client = await this.options.model.getClient(clientId, clientSecret);
             return client;
         }
         catch (e) {
@@ -27,7 +27,7 @@ let ClientHandler = class ClientHandler {
 };
 tslib_1.__decorate([
     appolo_engine_1.inject()
-], ClientHandler.prototype, "moduleOptions", void 0);
+], ClientHandler.prototype, "options", void 0);
 ClientHandler = tslib_1.__decorate([
     appolo_engine_1.define(),
     appolo_engine_1.singleton()
