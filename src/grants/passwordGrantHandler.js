@@ -20,7 +20,13 @@ let PasswordGruntHandler = class PasswordGruntHandler {
         let client = await this.clientHandler.getClient({ clientId, clientSecret, scope, grantType: enums_1.GrantType.Password });
         let user = await this._getUser(username, password);
         let scopes = await this._validateScope(user, client, scope);
-        let token = await this.tokensHelper.createTokens({ user, client, scopes });
+        let token = await this.tokensHelper.createTokens({
+            user,
+            client,
+            scopes,
+            refreshTokenLifetime: params.refreshTokenLifetime,
+            accessTokenLifetime: params.accessTokenLifetime
+        });
         return token;
     }
     async _getUser(username, password) {

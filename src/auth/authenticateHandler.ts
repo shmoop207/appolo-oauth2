@@ -8,12 +8,14 @@ import {InvalidTokenError} from "../common/errors/invalidTokenError";
 import {UnauthorizedRequestError} from "../common/errors/unauthorizedRequestError";
 import {InsufficientScopeError} from "../common/errors/insufficientScopeError";
 import {IAuthenticateParams} from "../interfaces/ITokenParams";
+import {TokensHelper} from "../tokens/tokensHelper";
 
 @define()
 @singleton()
 export class AuthenticateHandler {
 
     @inject() private options: IOptions;
+    @inject() private tokensHelper: TokensHelper;
 
     public async getToken(opts: IAuthenticateParams): Promise<IToken> {
 
@@ -21,7 +23,7 @@ export class AuthenticateHandler {
             throw new UnauthorizedRequestError('Unauthorized request: no authentication given');
         }
 
-        let accessToken = await this._getToken(opts.token);
+        let accessToken = await this._getToken(opts);
 
 
         this._validateToken(accessToken);
@@ -31,9 +33,9 @@ export class AuthenticateHandler {
         return accessToken;
     }
 
-    private async _getToken(token: string): Promise<IToken> {
+    private async _getToken(opts: IAuthenticateParams): Promise<IToken> {
 
-        let promise = (this.options.model as IAuthenticationModel).getAccessToken(token);
+        let promise = (this.options.model as IAuthenticationModel).getAccessToken(opts.token);
 
         let [err, accessToken] = await Promises.to(promise);
 
@@ -43,6 +45,10 @@ export class AuthenticateHandler {
 
         if (!accessToken) {
             throw new InvalidTokenError('Invalid token: access token is invalid');
+        }
+
+        if ( this.options.bumpLifeTime) {
+            accessToken = await this._bumpLifetime(accessToken)
         }
 
         return accessToken as IToken;
@@ -76,6 +82,16 @@ export class AuthenticateHandler {
         if (accessToken.accessTokenExpiresAt < new Date()) {
             throw new InvalidTokenError('Invalid token: access token has expired');
         }
+    }
+
+    private async _bumpLifetime(token: IToken): Promise<IToken> {
+
+        token.accessTokenLifetime && (token.accessTokenExpiresAt = this.tokensHelper.getExpireDate(token.accessTokenLifetime));
+        token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
+
+        let [accessToken] = await this.tokensHelper.saveTokens(token, token, token.client, token.user);
+
+        return accessToken;
 
     }
 

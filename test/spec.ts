@@ -149,7 +149,7 @@ describe("OAuth2Server Spec", function () {
 
         token.should.be.ok;
 
-        let tokenResult = await server.authenticate({token:token.accessToken});
+        let tokenResult = await server.authenticate({token: token.accessToken});
 
         tokenResult.should.be.ok;
 
@@ -179,7 +179,7 @@ describe("OAuth2Server Spec", function () {
 
             });
 
-            let tokenResult = await server.authenticate({token:token.accessToken});
+            let tokenResult = await server.authenticate({token: token.accessToken});
 
             tokenResult.should.not.be.ok;
 
@@ -206,7 +206,7 @@ describe("OAuth2Server Spec", function () {
 
             token.should.be.ok;
 
-            let tokenResult = await server.authenticate({token:token.accessToken + "11"});
+            let tokenResult = await server.authenticate({token: token.accessToken + "11"});
 
             tokenResult.should.not.be.ok;
 
@@ -331,7 +331,46 @@ describe("OAuth2Server Spec", function () {
 
         name.should.be.eq("aaaa")
         pass.should.be.eq("Fy9QfXhPXWAcMaWP")
-    })
+    });
+
+    it.only("should should bump lifeTime", async () => {
+        let clock;
+        let server = await createOAuth2Server({model: new TestModel(), bumpLifeTime: true});
+
+        let token = await server.login({
+            scope: ["scopeTest"],
+            clientId: "aa",
+            clientSecret: "bb",
+            username: "ccc",
+            password: "ddd", accessTokenLifetime: 60, refreshTokenLifetime: 120
+        });
+
+        token.should.be.ok;
+
+        token.accessToken.should.be.ok;
+        token.accessTokenLifetime.should.be.eq(60);
+        token.refreshTokenLifetime.should.be.eq(120);
+
+        let now = new Date();
+
+        now.setSeconds(now.getSeconds() + (60));
+
+        clock = sinon.useFakeTimers({
+            now: now,
+            shouldAdvanceTime: true,
+
+        });
+
+        let tokenResult = await server.authenticate({token: token.accessToken});
+
+        tokenResult.accessTokenLifetime.should.be.eq(60);
+        tokenResult.refreshTokenLifetime.should.be.eq(120);
+
+        (new Date(tokenResult.refreshTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gte(120000);
+        (new Date(tokenResult.accessTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gte(60000);
+
+        clock.restore();
+    });
 
 
 });

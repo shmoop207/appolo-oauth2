@@ -21,15 +21,21 @@ let TokensHelper = class TokensHelper {
         }
         return token || appolo_utils_1.Guid.guid();
     }
-    getAccessTokenExpiresAt(client) {
-        let tokenLifeTime = (client.accessTokenLifetime || this.options.accessTokenLifetime);
-        return this._getExpireDate(tokenLifeTime);
+    getAccessTokenLifetime(accessTokenLifetime, client) {
+        return (accessTokenLifetime || client.accessTokenLifetime || this.options.accessTokenLifetime);
     }
-    getRefreshTokenExpiresAt(client) {
-        let tokenLifeTime = (client.refreshTokenLifetime || this.options.refreshTokenLifetime);
-        return this._getExpireDate(tokenLifeTime);
+    getRefreshTokenLifetime(refreshTokenLifetime, client) {
+        return (refreshTokenLifetime || client.refreshTokenLifetime || this.options.refreshTokenLifetime);
     }
-    _getExpireDate(tokenLifeTime) {
+    getAccessTokenExpiresAt(accessTokenLifetime, client) {
+        let tokenLifeTime = this.getAccessTokenLifetime(accessTokenLifetime, client);
+        return this.getExpireDate(tokenLifeTime);
+    }
+    getRefreshTokenExpiresAt(refreshTokenLifetime, client) {
+        let tokenLifeTime = this.getRefreshTokenLifetime(refreshTokenLifetime, client);
+        return this.getExpireDate(tokenLifeTime);
+    }
+    getExpireDate(tokenLifeTime) {
         let expires = new Date();
         expires.setSeconds(expires.getSeconds() + tokenLifeTime);
         return expires;
@@ -39,21 +45,26 @@ let TokensHelper = class TokensHelper {
             this._createAccessToken(opts),
             this.options.useRefreshToken && this.createRefreshToken(opts)
         ]);
+        (this.options.bumpLifeTime) && (token.accessTokenLifetime = this.getAccessTokenLifetime(opts.accessTokenLifetime, opts.client));
         if (this.options.useRefreshToken) {
             token.refreshTokenExpiresAt = refreshToken.refreshTokenExpiresAt;
             token.refreshToken = refreshToken.refreshToken;
+            (this.options.bumpLifeTime) && (token.refreshTokenLifetime = this.getRefreshTokenLifetime(opts.refreshTokenLifetime, opts.client));
         }
-        [token, refreshToken] = await Promise.all([
-            this.saveToken(token, opts.client, opts.user),
-            this.options.useRefreshToken && this.saveTokenRefresh(refreshToken, opts.client, opts.user)
-        ]);
+        [token, refreshToken] = await this.saveTokens(token, refreshToken, opts.client, opts.user);
         return token;
+    }
+    saveTokens(token, refreshToken, client, user) {
+        return Promise.all([
+            this.saveAccessToken(token, client, user),
+            this.options.useRefreshToken && this.saveTokenRefresh(refreshToken, client, user)
+        ]);
     }
     async _createAccessToken(opts) {
         let accessToken = await this.generateAccessToken(opts);
         let token = {
             accessToken: accessToken,
-            accessTokenExpiresAt: this.getAccessTokenExpiresAt(opts.client),
+            accessTokenExpiresAt: this.getAccessTokenExpiresAt(opts.accessTokenLifetime, opts.client),
             client: opts.client,
             scope: opts.scopes,
             user: opts.user
@@ -66,12 +77,12 @@ let TokensHelper = class TokensHelper {
             client: opts.client,
             scope: opts.scopes,
             refreshToken: refreshToken,
-            refreshTokenExpiresAt: this.getRefreshTokenExpiresAt(opts.client),
+            refreshTokenExpiresAt: this.getRefreshTokenExpiresAt(opts.refreshTokenLifetime, opts.client),
             user: opts.user
         };
         return token;
     }
-    async saveToken(token, client, user) {
+    async saveAccessToken(token, client, user) {
         let promise = this.options.model.saveToken(token, client, user);
         let [err, validToken] = await appolo_utils_2.Promises.to(promise);
         if (err) {

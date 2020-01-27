@@ -45,7 +45,13 @@ export class PasswordGruntHandler {
         let scopes = await this._validateScope(user, client, scope);
 
 
-        let token = await this.tokensHelper.createTokens({user, client, scopes});
+        let token = await this.tokensHelper.createTokens({
+            user,
+            client,
+            scopes,
+            refreshTokenLifetime: params.refreshTokenLifetime,
+            accessTokenLifetime: params.accessTokenLifetime
+        });
 
         return token;
 

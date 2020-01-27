@@ -24,6 +24,6 @@ export interface IRefreshParams extends IBaseParams, ITokenLifetimeParams {
 
 }
 
-export interface IAuthenticateParams extends ITokenLifetimeParams {
+export interface IAuthenticateParams {
     token: string
 }

@@ -26,7 +26,12 @@ export class RefreshGrantHandler {
 
         let {refreshToken, scope, clientSecret, clientId} = params;
 
-        let client = await this.clientHandler.getClient({clientId, clientSecret, scope, grantType: GrantType.RefreshToken});
+        let client = await this.clientHandler.getClient({
+            clientId,
+            clientSecret,
+            scope,
+            grantType: GrantType.RefreshToken
+        });
 
         let refreshTokenDb = await this._getRefreshToken(refreshToken);
 
@@ -37,7 +42,9 @@ export class RefreshGrantHandler {
         let token = await this.tokensHelper.createTokens({
             scopes: refreshTokenDb.scope,
             client: client,
-            user: refreshTokenDb.user
+            user: refreshTokenDb.user,
+            refreshTokenLifetime: params.refreshTokenLifetime,
+            accessTokenLifetime: params.accessTokenLifetime
         });
 
         return token;

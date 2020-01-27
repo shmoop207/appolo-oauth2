@@ -9,14 +9,21 @@ const enums_1 = require("../common/enums");
 let RefreshGrantHandler = class RefreshGrantHandler {
     async refreshToken(params) {
         let { refreshToken, scope, clientSecret, clientId } = params;
-        let client = await this.clientHandler.getClient({ clientId, clientSecret, scope, grantType: enums_1.GrantType.RefreshToken });
+        let client = await this.clientHandler.getClient({
+            clientId,
+            clientSecret,
+            scope,
+            grantType: enums_1.GrantType.RefreshToken
+        });
         let refreshTokenDb = await this._getRefreshToken(refreshToken);
         this._validateToken(refreshTokenDb, client);
         await this.tokensHelper.revokeRefreshToken(refreshTokenDb);
         let token = await this.tokensHelper.createTokens({
             scopes: refreshTokenDb.scope,
             client: client,
-            user: refreshTokenDb.user
+            user: refreshTokenDb.user,
+            refreshTokenLifetime: params.refreshTokenLifetime,
+            accessTokenLifetime: params.accessTokenLifetime
         });
         return token;
     }

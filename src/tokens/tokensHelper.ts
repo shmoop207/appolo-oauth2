@@ -43,20 +43,29 @@ export class TokensHelper {
         return token || Guid.guid();
     }
 
-    public getAccessTokenExpiresAt(client: IClient): Date {
-        let tokenLifeTime = (client.accessTokenLifetime || this.options.accessTokenLifetime);
-
-        return this._getExpireDate(tokenLifeTime);
+    public getAccessTokenLifetime(accessTokenLifetime: number, client: IClient): number {
+        return (accessTokenLifetime || client.accessTokenLifetime || this.options.accessTokenLifetime)
     }
 
-    public getRefreshTokenExpiresAt(client: IClient): Date {
-
-        let tokenLifeTime = (client.refreshTokenLifetime || this.options.refreshTokenLifetime);
-
-        return this._getExpireDate(tokenLifeTime);
+    public getRefreshTokenLifetime(refreshTokenLifetime: number, client: IClient): number {
+        return (refreshTokenLifetime || client.refreshTokenLifetime || this.options.refreshTokenLifetime)
     }
 
-    private _getExpireDate(tokenLifeTime: number): Date {
+
+    public getAccessTokenExpiresAt(accessTokenLifetime: number, client: IClient): Date {
+        let tokenLifeTime = this.getAccessTokenLifetime(accessTokenLifetime, client);
+
+        return this.getExpireDate(tokenLifeTime);
+    }
+
+    public getRefreshTokenExpiresAt(refreshTokenLifetime: number, client: IClient): Date {
+
+        let tokenLifeTime = this.getRefreshTokenLifetime(refreshTokenLifetime, client);
+
+        return this.getExpireDate(tokenLifeTime);
+    }
+
+    public getExpireDate(tokenLifeTime: number): Date {
         let expires = new Date();
 
         expires.setSeconds(expires.getSeconds() + tokenLifeTime);
@@ -64,34 +73,43 @@ export class TokensHelper {
         return expires;
     }
 
-    public async createTokens(opts: { client: IClient, user: IUser, scopes: string[] }): Promise<IToken> {
+    public async createTokens(opts: { client: IClient, user: IUser, scopes: string[], accessTokenLifetime: number, refreshTokenLifetime: number }): Promise<IToken> {
 
 
-        let [token, refreshToken] = await Promise.all([
+        let [token, refreshToken] = await Promise.all<IToken, IRefreshToken>([
             this._createAccessToken(opts),
             this.options.useRefreshToken && this.createRefreshToken(opts)]);
 
+        (this.options.bumpLifeTime) && (token.accessTokenLifetime = this.getAccessTokenLifetime(opts.accessTokenLifetime, opts.client));
 
         if (this.options.useRefreshToken) {
             token.refreshTokenExpiresAt = refreshToken.refreshTokenExpiresAt;
             token.refreshToken = refreshToken.refreshToken;
+
+            (this.options.bumpLifeTime) && (token.refreshTokenLifetime = this.getRefreshTokenLifetime(opts.refreshTokenLifetime, opts.client));
         }
 
-        [token, refreshToken] = await Promise.all([
-            this.saveToken(token as IToken, opts.client, opts.user),
-            this.options.useRefreshToken && this.saveTokenRefresh(refreshToken as IRefreshToken, opts.client, opts.user)]);
-
+        [token, refreshToken] = await this.saveTokens(token, refreshToken, opts.client, opts.user);
 
         return token as IToken;
     }
 
-    private async _createAccessToken(opts: { client: IClient, user: IUser, scopes: string[] }): Promise<IToken> {
+    public saveTokens(token: IToken, refreshToken: IRefreshToken, client: IClient, user: IUser): Promise<[IToken, IRefreshToken]> {
+
+        return Promise.all<IToken, IRefreshToken>([
+            this.saveAccessToken(token as IToken, client, user),
+            this.options.useRefreshToken && this.saveTokenRefresh(refreshToken, client, user)
+        ]);
+    }
+
+
+    private async _createAccessToken(opts: { client: IClient, user: IUser, scopes: string[], accessTokenLifetime: number }): Promise<IToken> {
 
         let accessToken = await this.generateAccessToken(opts);
 
         let token: IToken = {
             accessToken: accessToken,
-            accessTokenExpiresAt: this.getAccessTokenExpiresAt(opts.client),
+            accessTokenExpiresAt: this.getAccessTokenExpiresAt(opts.accessTokenLifetime, opts.client),
             client: opts.client,
             scope: opts.scopes,
             user: opts.user
@@ -100,7 +118,7 @@ export class TokensHelper {
         return token;
     }
 
-    public async createRefreshToken(opts: { client: IClient, user: IUser, scopes: string[] }): Promise<IRefreshToken> {
+    public async createRefreshToken(opts: { client: IClient, user: IUser, scopes: string[], refreshTokenLifetime: number }): Promise<IRefreshToken> {
 
         let refreshToken = await this.generateRefreshToken(opts);
 
@@ -108,14 +126,14 @@ export class TokensHelper {
             client: opts.client,
             scope: opts.scopes,
             refreshToken: refreshToken,
-            refreshTokenExpiresAt: this.getRefreshTokenExpiresAt(opts.client),
+            refreshTokenExpiresAt: this.getRefreshTokenExpiresAt(opts.refreshTokenLifetime, opts.client),
             user: opts.user
         };
 
         return token;
     }
 
-    public async saveToken(token: IToken, client: IClient, user: IUser): Promise<IToken> {
+    public async saveAccessToken(token: IToken, client: IClient, user: IUser): Promise<IToken> {
 
         let promise = (this.options.model as IPasswordModel).saveToken(token, client, user);
 
