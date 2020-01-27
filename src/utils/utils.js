@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Utils {
     static getTokenFromBearer(authorization) {
-        return authorization.split("Bearer")[1];
+        return authorization.split("Bearer ")[1];
     }
     static parseAuthorization(authorization) {
         if (typeof authorization !== 'string') {
