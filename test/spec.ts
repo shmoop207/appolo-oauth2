@@ -18,11 +18,12 @@ chai.use(sinonChai);
 
 describe("OAuth2Server Spec", function () {
 
-    let server: OAuth2Server;
+    let server: OAuth2Server, model: TestModel;
 
 
     beforeEach(async () => {
-        server = await createOAuth2Server({scopes: ["scopeTest"], model: new TestModel()})
+        model = new TestModel();
+        server = await createOAuth2Server({scopes: ["scopeTest"], model})
 
     });
 
@@ -32,8 +33,7 @@ describe("OAuth2Server Spec", function () {
 
     it("should get token", async () => {
 
-        let token = await server.token({
-            grantType: GrantType.Password,
+        let token = await server.login({
             scope: ["scopeTest"],
             clientId: "aa",
             clientSecret: "bb",
@@ -58,8 +58,7 @@ describe("OAuth2Server Spec", function () {
     it("should throw invalid client", async () => {
 
         try {
-            let token = await server.token({
-                grantType: GrantType.Password,
+            let token = await server.login({
                 scope: ["scopeTest"],
                 clientId: "aaa",
                 clientSecret: "bb",
@@ -77,8 +76,7 @@ describe("OAuth2Server Spec", function () {
     it("should throw invalid password", async () => {
 
         try {
-            let token = await server.token({
-                grantType: GrantType.Password,
+            let token = await server.login({
                 scope: ["scopeTest"],
                 clientId: "aa",
                 clientSecret: "bb",
@@ -97,8 +95,7 @@ describe("OAuth2Server Spec", function () {
     it("should throw scope password", async () => {
 
         try {
-            let token = await server.token({
-                grantType: GrantType.Password,
+            let token = await server.login({
                 scope: ["scopeTest2"],
                 clientId: "aa",
                 clientSecret: "bb",
@@ -116,10 +113,14 @@ describe("OAuth2Server Spec", function () {
 
     it("should throw invalid grant type password", async () => {
 
+        let stub = sinon.stub(model, "getClient").callsFake(() => {
+            return Promise.resolve({grants: [], id: "111"})
+        });
+
         try {
-            let token = await server.token({
-                grantType: "aaa" as any,
-                scope: ["scopeTest2"],
+
+            let token = await server.login({
+                scope: ["scopeTest"],
                 clientId: "aa",
                 clientSecret: "bb",
                 username: "ccc",
@@ -128,16 +129,17 @@ describe("OAuth2Server Spec", function () {
             token.should.not.be.ok;
         } catch (e) {
             e.should.be.ok;
-            e.name.should.be.eq("invalid_request");
-            e.message.should.be.eq("Unsupported grant type: `grant_type` is invalid");
+            e.name.should.be.eq("unauthorized_client");
+            e.message.should.be.eq("Unauthorized client: `grant_type` is invalid");
             e.code.should.be.eq(400);
         }
+
+        stub.restore();
     });
 
     it("should get token", async () => {
 
-        let token = await server.token({
-            grantType: GrantType.Password,
+        let token = await server.login({
             scope: ["scopeTest"],
             clientId: "aa",
             clientSecret: "bb",
@@ -157,8 +159,7 @@ describe("OAuth2Server Spec", function () {
     it("should throw expire token", async () => {
         let clock;
         try {
-            let token = await server.token({
-                grantType: GrantType.Password,
+            let token = await server.login({
                 scope: ["scopeTest"],
                 clientId: "aa",
                 clientSecret: "bb",
@@ -195,8 +196,7 @@ describe("OAuth2Server Spec", function () {
     it("should throw invalid token", async () => {
 
         try {
-            let token = await server.token({
-                grantType: GrantType.Password,
+            let token = await server.login({
                 scope: ["scopeTest"],
                 clientId: "aa",
                 clientSecret: "bb",
@@ -220,8 +220,7 @@ describe("OAuth2Server Spec", function () {
 
     it("should get refresh token", async () => {
 
-        let token = await server.token({
-            grantType: GrantType.Password,
+        let token = await server.login({
             scope: ["scopeTest"],
             clientId: "aa",
             clientSecret: "bb",
@@ -231,8 +230,7 @@ describe("OAuth2Server Spec", function () {
 
         token.should.be.ok;
 
-        let tokenResult = await server.token({
-            grantType: GrantType.RefreshToken,
+        let tokenResult = await server.refreshToken({
             scope: ["scopeTest"],
             clientId: "aa",
             clientSecret: "bb",
@@ -256,8 +254,7 @@ describe("OAuth2Server Spec", function () {
         let clock;
         try {
 
-            let token = await server.token({
-                grantType: GrantType.Password,
+            let token = await server.login({
                 scope: ["scopeTest"],
                 clientId: "aa",
                 clientSecret: "bb",
@@ -277,8 +274,7 @@ describe("OAuth2Server Spec", function () {
 
             });
 
-            let tokenResult = await server.token({
-                grantType: GrantType.RefreshToken,
+            let tokenResult = await server.refreshToken({
                 scope: ["scopeTest"],
                 clientId: "aa",
                 clientSecret: "bb",
@@ -301,8 +297,7 @@ describe("OAuth2Server Spec", function () {
 
         try {
 
-            let token = await server.token({
-                grantType: GrantType.Password,
+            let token = await server.login({
                 scope: ["scopeTest"],
                 clientId: "aa",
                 clientSecret: "bb",
@@ -312,12 +307,11 @@ describe("OAuth2Server Spec", function () {
 
             token.should.be.ok;
 
-            let tokenResult = await server.token({
-                grantType: GrantType.RefreshToken,
+            let tokenResult = await server.refreshToken({
                 scope: ["scopeTest"],
                 clientId: "aa",
                 clientSecret: "bb",
-                refreshToken: token.refreshToken+"11"
+                refreshToken: token.refreshToken + "11"
             });
 
             tokenResult.should.not.be.ok;
@@ -333,12 +327,11 @@ describe("OAuth2Server Spec", function () {
     });
 
     it("should parse Authorization", async () => {
-        let {name,pass} = Utils.parseAuthorization("Basic YWFhYTpGeTlRZlhoUFhXQWNNYVdQ");
+        let {name, pass} = Utils.parseAuthorization("Basic YWFhYTpGeTlRZlhoUFhXQWNNYVdQ");
 
         name.should.be.eq("aaaa")
         pass.should.be.eq("Fy9QfXhPXWAcMaWP")
     })
-
 
 
 });

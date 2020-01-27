@@ -8,6 +8,15 @@ import {App, createApp} from 'appolo-engine';
 import {Defaults} from "./src/common/defaults";
 import {OAuth2Server} from "./src/oAuth2Server";
 import {Utils} from "./src/utils/utils";
+import {InsufficientScopeError} from "./src/common/errors/insufficientScopeError";
+import {InvalidClientError} from "./src/common/errors/invalidClientError";
+import {InvalidGrantError} from "./src/common/errors/invalidGrantError";
+import {InvalidRequestError} from "./src/common/errors/invalidRequestError";
+import {InvalidScopeError} from "./src/common/errors/invalidScopeError";
+import {InvalidTokenError} from "./src/common/errors/invalidTokenError";
+import {ServerError} from "./src/common/errors/serverError";
+import {UnauthorizedClientError} from "./src/common/errors/unauthorizedClientError";
+import {UnauthorizedRequestError} from "./src/common/errors/unauthorizedRequestError";
 
 export {
     IOptions,
@@ -19,7 +28,8 @@ export {
     Falsey,
     IUser,
     IToken,
-    IRefreshToken,GrantType,Utils
+    IRefreshToken,GrantType,Utils,InsufficientScopeError,InvalidClientError,InvalidGrantError,
+    InvalidRequestError,InvalidScopeError,InvalidTokenError,ServerError,UnauthorizedClientError,UnauthorizedRequestError
 }
 
 export async function createOAuth2Server(options: IOptions): Promise<OAuth2Server> {

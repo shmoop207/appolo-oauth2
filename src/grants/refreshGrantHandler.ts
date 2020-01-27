@@ -9,29 +9,34 @@ import {IGrantHandler, IGrantParams} from "../interfaces/IGrantHandler";
 import {Promises} from "appolo-utils";
 import {GrantType} from "../common/enums";
 import {IClient} from "../interfaces/IClient";
+import {ClientHandler} from "../clients/clientHandler";
 
 @define()
 @singleton()
 @alias("IGrantHandler")
-export class RefreshGrantHandler implements IGrantHandler {
+export class RefreshGrantHandler {
 
     @inject() options: IOptions;
     @inject() tokensHelper: TokensHelper;
+    @inject() clientHandler: ClientHandler;
 
-    public TYPE = GrantType.RefreshToken;
 
-    public async handle(params: IGrantParams): Promise<IToken> {
+    public async refreshToken(params: { clientId: string, clientSecret: string, refreshToken: string, scope: string[] }): Promise<IToken> {
 
-        let refreshToken = await this._getRefreshToken(params.refreshToken);
+        let {refreshToken, scope, clientSecret, clientId} = params;
 
-        this._validateToken(refreshToken, params.client);
+        let client = await this.clientHandler.getClient({clientId, clientSecret, scope, grantType: GrantType.RefreshToken});
 
-        await this.tokensHelper.revokeRefreshToken(refreshToken);
+        let refreshTokenDb = await this._getRefreshToken(refreshToken);
+
+        this._validateToken(refreshTokenDb, client);
+
+        await this.tokensHelper.revokeRefreshToken(refreshTokenDb);
 
         let token = await this.tokensHelper.createTokens({
-            scopes: refreshToken.scope,
-            client: params.client,
-            user: refreshToken.user
+            scopes: refreshTokenDb.scope,
+            client: client,
+            user: refreshTokenDb.user
         });
 
         return token;

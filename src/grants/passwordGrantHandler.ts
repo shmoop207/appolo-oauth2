@@ -1,4 +1,4 @@
-import {define, singleton, inject, alias} from "appolo-engine";
+import {alias, define, inject, singleton} from "appolo-engine";
 import {IOptions} from "../interfaces/IOptions";
 import {IPasswordModel} from "../interfaces/IModel";
 import {InvalidGrantError} from "../common/errors/invalidGrantError";
@@ -8,36 +8,40 @@ import {InvalidScopeError} from "../common/errors/invalidScopeError";
 import {TokensHelper} from "../tokens/tokensHelper";
 import {IToken} from "../interfaces/IToken";
 import {IUser} from "../interfaces/IUser";
-import {IGrantHandler, IGrantParams} from "../interfaces/IGrantHandler";
+import {IGrantHandler} from "../interfaces/IGrantHandler";
 import {InvalidRequestError} from "../common/errors/invalidRequestError";
 import {Promises} from "appolo-utils";
 import {GrantType} from "../common/enums";
+import {ClientHandler} from "../clients/clientHandler";
 
 @define()
 @singleton()
 @alias("IGrantHandler")
-export class PasswordGruntHandler implements IGrantHandler {
+export class PasswordGruntHandler {
 
     @inject() options: IOptions;
     @inject() tokensHelper: TokensHelper;
+    @inject() clientHandler: ClientHandler;
 
-    public TYPE = GrantType.Password;
 
-    public async handle(params: IGrantParams): Promise<IToken> {
+    public async createToken(params: { clientId: string, clientSecret: string, username: string, password: string, scope: string[] }): Promise<IToken> {
 
-        if (!params.username) {
+        let {username, password, scope, clientSecret, clientId} = params;
+
+        if (!username) {
             throw new InvalidRequestError('Missing parameter: `username`');
         }
 
-        if (!params.password) {
+        if (!password) {
             throw new InvalidRequestError('Missing parameter: `Password`');
         }
 
-        let {client} = params;
+        let client = await this.clientHandler.getClient({clientId, clientSecret, scope, grantType: GrantType.Password});
 
-        let user = await this._getUser(params.username, params.password);
 
-        let scopes = await this._validateScope(user, client, params.scope);
+        let user = await this._getUser(username, password);
+
+        let scopes = await this._validateScope(user, client, scope);
 
 
         let token = await this.tokensHelper.createTokens({user, client, scopes});
@@ -63,13 +67,13 @@ export class PasswordGruntHandler implements IGrantHandler {
         return user;
     }
 
-    private async _validateScope(user: IUser, client: IClient, scopes: string[]):Promise<string[]> {
+    private async _validateScope(user: IUser, client: IClient, scopes: string[]): Promise<string[]> {
 
-        let promise  = (this.options.model as IPasswordModel).validateScope(user, client, scopes);
+        let promise = (this.options.model as IPasswordModel).validateScope(user, client, scopes);
 
-        let [err,validScopes] = await Promises.to(promise);
+        let [err, validScopes] = await Promises.to(promise);
 
-        if(err){
+        if (err) {
             throw new ServerError(`server error: ${(err || "").toString()}`)
         }
 

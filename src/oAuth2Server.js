@@ -8,8 +8,11 @@ let OAuth2Server = class OAuth2Server {
     authenticate(token) {
         return this.authenticateHandler.getToken({ token });
     }
-    token(params) {
-        return this.tokenHandler.createToken(params);
+    login(params) {
+        return this.passwordGruntHandler.createToken(params);
+    }
+    refreshToken(params) {
+        return this.refreshGrantHandler.refreshToken(params);
     }
     revokeToken(token) {
         return this.tokenHandler.revokeToken(token);
@@ -21,6 +24,12 @@ tslib_1.__decorate([
 tslib_1.__decorate([
     appolo_engine_1.inject()
 ], OAuth2Server.prototype, "authenticateHandler", void 0);
+tslib_1.__decorate([
+    appolo_engine_1.inject()
+], OAuth2Server.prototype, "passwordGruntHandler", void 0);
+tslib_1.__decorate([
+    appolo_engine_1.inject()
+], OAuth2Server.prototype, "refreshGrantHandler", void 0);
 tslib_1.__decorate([
     appolo_engine_1.initMethod()
 ], OAuth2Server.prototype, "_initialize", null);

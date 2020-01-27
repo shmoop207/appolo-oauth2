@@ -9,19 +9,17 @@ const invalidRequestError_1 = require("../common/errors/invalidRequestError");
 const appolo_utils_1 = require("appolo-utils");
 const enums_1 = require("../common/enums");
 let PasswordGruntHandler = class PasswordGruntHandler {
-    constructor() {
-        this.TYPE = enums_1.GrantType.Password;
-    }
-    async handle(params) {
-        if (!params.username) {
+    async createToken(params) {
+        let { username, password, scope, clientSecret, clientId } = params;
+        if (!username) {
             throw new invalidRequestError_1.InvalidRequestError('Missing parameter: `username`');
         }
-        if (!params.password) {
+        if (!password) {
             throw new invalidRequestError_1.InvalidRequestError('Missing parameter: `Password`');
         }
-        let { client } = params;
-        let user = await this._getUser(params.username, params.password);
-        let scopes = await this._validateScope(user, client, params.scope);
+        let client = await this.clientHandler.getClient({ clientId, clientSecret, scope, grantType: enums_1.GrantType.Password });
+        let user = await this._getUser(username, password);
+        let scopes = await this._validateScope(user, client, scope);
         let token = await this.tokensHelper.createTokens({ user, client, scopes });
         return token;
     }
@@ -54,6 +52,9 @@ tslib_1.__decorate([
 tslib_1.__decorate([
     appolo_engine_1.inject()
 ], PasswordGruntHandler.prototype, "tokensHelper", void 0);
+tslib_1.__decorate([
+    appolo_engine_1.inject()
+], PasswordGruntHandler.prototype, "clientHandler", void 0);
 PasswordGruntHandler = tslib_1.__decorate([
     appolo_engine_1.define(),
     appolo_engine_1.singleton(),

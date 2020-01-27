@@ -104,7 +104,7 @@ let TokensHelper = class TokensHelper {
             throw new invalidGrantError_1.InvalidGrantError('Invalid grant: failed to revoke token');
         }
     }
-    async revokeToken(token) {
+    async revokeAccessToken(token) {
         let model = this.options.model;
         let promise = model.revokeToken(token);
         let [err, result] = await appolo_utils_2.Promises.to(promise);
@@ -119,6 +119,9 @@ let TokensHelper = class TokensHelper {
 tslib_1.__decorate([
     appolo_engine_1.inject()
 ], TokensHelper.prototype, "options", void 0);
+tslib_1.__decorate([
+    appolo_engine_1.inject()
+], TokensHelper.prototype, "clientHandler", void 0);
 TokensHelper = tslib_1.__decorate([
     appolo_engine_1.define(),
     appolo_engine_1.singleton()

@@ -8,12 +8,18 @@ import {IPasswordModel, IRefreshTokenModel} from "../interfaces/IModel";
 import {ServerError} from "../common/errors/serverError";
 import {Promises} from "appolo-utils";
 import {InvalidGrantError} from "../common/errors/invalidGrantError";
+import {ClientHandler} from "../clients/clientHandler";
+import {UnauthorizedClientError} from "../common/errors/unauthorizedClientError";
+import {GrantType} from "../common/enums";
 
 @define()
 @singleton()
 export class TokensHelper {
 
     @inject() private options: IOptions;
+
+    @inject() clientHandler: ClientHandler;
+
 
     public async generateAccessToken(opts: { client: IClient, user: IUser, scopes: string[] }): Promise<string> {
 
@@ -109,7 +115,7 @@ export class TokensHelper {
         return token;
     }
 
-    public async saveToken(token: IToken, client: IClient, user: IUser):Promise<IToken> {
+    public async saveToken(token: IToken, client: IClient, user: IUser): Promise<IToken> {
 
         let promise = (this.options.model as IPasswordModel).saveToken(token, client, user);
 
@@ -127,7 +133,7 @@ export class TokensHelper {
 
     }
 
-    public async saveTokenRefresh(token: IRefreshToken, client: IClient, user: IUser):Promise<IRefreshToken> {
+    public async saveTokenRefresh(token: IRefreshToken, client: IClient, user: IUser): Promise<IRefreshToken> {
 
         let promise = (this.options.model as IRefreshTokenModel).saveRefreshToken(token, client, user);
 
@@ -144,36 +150,37 @@ export class TokensHelper {
         return validToken
     }
 
-    public async revokeRefreshToken(token:IRefreshToken){
+    public async revokeRefreshToken(token: IRefreshToken) {
         let model = this.options.model as IRefreshTokenModel;
 
         let promise = model.revokeRefreshToken(token);
 
-        let [err,result] =await Promises.to(promise);
+        let [err, result] = await Promises.to(promise);
 
-        if(err){
+        if (err) {
             throw new ServerError(`server error: ${(err || "").toString()}`)
         }
 
-        if(!result){
+        if (!result) {
             throw new InvalidGrantError('Invalid grant: failed to revoke token');
         }
     }
 
-    public async revokeToken(token:IToken){
+    public async revokeAccessToken(token: IToken) {
         let model = this.options.model as IPasswordModel;
 
         let promise = model.revokeToken(token);
 
-        let [err,result] =await Promises.to(promise);
+        let [err, result] = await Promises.to(promise);
 
-        if(err){
+        if (err) {
             throw new ServerError(`server error: ${(err || "").toString()}`)
         }
 
-        if(!result){
+        if (!result) {
             throw new InvalidGrantError('Invalid grant: failed to token');
         }
     }
+
 
 }

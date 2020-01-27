@@ -7,17 +7,16 @@ const serverError_1 = require("../common/errors/serverError");
 const appolo_utils_1 = require("appolo-utils");
 const enums_1 = require("../common/enums");
 let RefreshGrantHandler = class RefreshGrantHandler {
-    constructor() {
-        this.TYPE = enums_1.GrantType.RefreshToken;
-    }
-    async handle(params) {
-        let refreshToken = await this._getRefreshToken(params.refreshToken);
-        this._validateToken(refreshToken, params.client);
-        await this.tokensHelper.revokeRefreshToken(refreshToken);
+    async refreshToken(params) {
+        let { refreshToken, scope, clientSecret, clientId } = params;
+        let client = await this.clientHandler.getClient({ clientId, clientSecret, scope, grantType: enums_1.GrantType.RefreshToken });
+        let refreshTokenDb = await this._getRefreshToken(refreshToken);
+        this._validateToken(refreshTokenDb, client);
+        await this.tokensHelper.revokeRefreshToken(refreshTokenDb);
         let token = await this.tokensHelper.createTokens({
-            scopes: refreshToken.scope,
-            client: params.client,
-            user: refreshToken.user
+            scopes: refreshTokenDb.scope,
+            client: client,
+            user: refreshTokenDb.user
         });
         return token;
     }
@@ -56,6 +55,9 @@ tslib_1.__decorate([
 tslib_1.__decorate([
     appolo_engine_1.inject()
 ], RefreshGrantHandler.prototype, "tokensHelper", void 0);
+tslib_1.__decorate([
+    appolo_engine_1.inject()
+], RefreshGrantHandler.prototype, "clientHandler", void 0);
 RefreshGrantHandler = tslib_1.__decorate([
     appolo_engine_1.define(),
     appolo_engine_1.singleton(),

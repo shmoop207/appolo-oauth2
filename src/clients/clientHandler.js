@@ -4,6 +4,8 @@ const tslib_1 = require("tslib");
 const appolo_engine_1 = require("appolo-engine");
 const invalidClientError_1 = require("../common/errors/invalidClientError");
 const invalidRequestError_1 = require("../common/errors/invalidRequestError");
+const serverError_1 = require("../common/errors/serverError");
+const unauthorizedClientError_1 = require("../common/errors/unauthorizedClientError");
 let ClientHandler = class ClientHandler {
     async getClient(params) {
         if (!params.clientId || !params.clientSecret) {
@@ -12,6 +14,15 @@ let ClientHandler = class ClientHandler {
         let client = await this._getClientFromModel(params.clientId, params.clientSecret);
         if (!client) {
             throw new invalidClientError_1.InvalidClientError("Invalid client: client is invalid");
+        }
+        if (!client.grants || !Array.isArray(client.grants)) {
+            throw new serverError_1.ServerError("Server error: `grants` must be an array");
+        }
+        if (!client.grants.includes(params.grantType)) {
+            throw new unauthorizedClientError_1.UnauthorizedClientError('Unauthorized client: `grant_type` is invalid');
+        }
+        if (params.scope && client.scopes && client.scopes.length && !params.scope.every(scope => client.scopes.includes(scope))) {
+            throw new unauthorizedClientError_1.UnauthorizedClientError('Unauthorized client: `scope` is invalid');
         }
         return client;
     }
