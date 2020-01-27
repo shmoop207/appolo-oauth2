@@ -117,7 +117,7 @@ describe("OAuth2Server Spec", function () {
             password: "ddd"
         });
         token.should.be.ok;
-        let tokenResult = await server.authenticate(token.accessToken);
+        let tokenResult = await server.authenticate({ token: token.accessToken });
         tokenResult.should.be.ok;
         tokenResult.should.be.eq(token);
     });
@@ -138,7 +138,7 @@ describe("OAuth2Server Spec", function () {
                 now: now,
                 shouldAdvanceTime: true,
             });
-            let tokenResult = await server.authenticate(token.accessToken);
+            let tokenResult = await server.authenticate({ token: token.accessToken });
             tokenResult.should.not.be.ok;
         }
         catch (e) {
@@ -159,7 +159,7 @@ describe("OAuth2Server Spec", function () {
                 password: "ddd"
             });
             token.should.be.ok;
-            let tokenResult = await server.authenticate(token.accessToken + "11");
+            let tokenResult = await server.authenticate({ token: token.accessToken + "11" });
             tokenResult.should.not.be.ok;
         }
         catch (e) {

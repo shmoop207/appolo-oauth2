@@ -24,4 +24,6 @@ interface TokenOptions {
 
     useRefreshToken?: boolean
 
+    bumpLifeTime?:boolean
+
 }

@@ -1,10 +1,5 @@
 import {define, inject, singleton, injectAlias} from "appolo-engine";
-import {ICreateTokenParams} from "../interfaces/ICreateTokenParams";
-import {IToken} from "../interfaces/IToken";
 import {IOptions} from "../interfaces/IOptions";
-import {ClientHandler} from "../clients/clientHandler";
-import {IGrantHandler} from "../interfaces/IGrantHandler";
-import {GrantType} from "../common/enums";
 import {AuthenticateHandler} from "../auth/authenticateHandler";
 import {TokensHelper} from "./tokensHelper";
 

@@ -13,6 +13,7 @@ import {InvalidRequestError} from "../common/errors/invalidRequestError";
 import {Promises} from "appolo-utils";
 import {GrantType} from "../common/enums";
 import {ClientHandler} from "../clients/clientHandler";
+import {ILoginParams} from "../interfaces/ITokenParams";
 
 @define()
 @singleton()
@@ -24,7 +25,7 @@ export class PasswordGruntHandler {
     @inject() clientHandler: ClientHandler;
 
 
-    public async createToken(params: { clientId: string, clientSecret: string, username: string, password: string, scope: string[] }): Promise<IToken> {
+    public async createToken(params: ILoginParams): Promise<IToken> {
 
         let {username, password, scope, clientSecret, clientId} = params;
 

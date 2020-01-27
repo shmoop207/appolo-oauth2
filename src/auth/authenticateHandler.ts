@@ -7,6 +7,7 @@ import {ServerError} from "../common/errors/serverError";
 import {InvalidTokenError} from "../common/errors/invalidTokenError";
 import {UnauthorizedRequestError} from "../common/errors/unauthorizedRequestError";
 import {InsufficientScopeError} from "../common/errors/insufficientScopeError";
+import {IAuthenticateParams} from "../interfaces/ITokenParams";
 
 @define()
 @singleton()
@@ -14,7 +15,7 @@ export class AuthenticateHandler {
 
     @inject() private options: IOptions;
 
-    public async getToken(opts: { token: string }): Promise<IToken> {
+    public async getToken(opts: IAuthenticateParams): Promise<IToken> {
 
         if (!opts.token) {
             throw new UnauthorizedRequestError('Unauthorized request: no authentication given');

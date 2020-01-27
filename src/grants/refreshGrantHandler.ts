@@ -10,6 +10,7 @@ import {Promises} from "appolo-utils";
 import {GrantType} from "../common/enums";
 import {IClient} from "../interfaces/IClient";
 import {ClientHandler} from "../clients/clientHandler";
+import {IRefreshParams} from "../interfaces/ITokenParams";
 
 @define()
 @singleton()
@@ -21,7 +22,7 @@ export class RefreshGrantHandler {
     @inject() clientHandler: ClientHandler;
 
 
-    public async refreshToken(params: { clientId: string, clientSecret: string, refreshToken: string, scope: string[] }): Promise<IToken> {
+    public async refreshToken(params: IRefreshParams): Promise<IToken> {
 
         let {refreshToken, scope, clientSecret, clientId} = params;
 

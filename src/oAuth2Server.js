@@ -5,8 +5,8 @@ const appolo_engine_1 = require("appolo-engine");
 let OAuth2Server = class OAuth2Server {
     _initialize() {
     }
-    authenticate(token) {
-        return this.authenticateHandler.getToken({ token });
+    authenticate(params) {
+        return this.authenticateHandler.getToken(params);
     }
     login(params) {
         return this.passwordGruntHandler.createToken(params);

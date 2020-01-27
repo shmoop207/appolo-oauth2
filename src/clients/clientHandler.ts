@@ -1,6 +1,4 @@
 import {define, inject, singleton} from "appolo-engine";
-import {ICreateTokenParams} from "../interfaces/ICreateTokenParams";
-import {IToken} from "../interfaces/IToken";
 import {IClient} from "../interfaces/IClient";
 import {IOptions} from "../interfaces/IOptions";
 import {InvalidClientError} from "../common/errors/invalidClientError";

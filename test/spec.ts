@@ -149,7 +149,7 @@ describe("OAuth2Server Spec", function () {
 
         token.should.be.ok;
 
-        let tokenResult = await server.authenticate(token.accessToken);
+        let tokenResult = await server.authenticate({token:token.accessToken});
 
         tokenResult.should.be.ok;
 
@@ -179,7 +179,7 @@ describe("OAuth2Server Spec", function () {
 
             });
 
-            let tokenResult = await server.authenticate(token.accessToken);
+            let tokenResult = await server.authenticate({token:token.accessToken});
 
             tokenResult.should.not.be.ok;
 
@@ -206,7 +206,7 @@ describe("OAuth2Server Spec", function () {
 
             token.should.be.ok;
 
-            let tokenResult = await server.authenticate(token.accessToken + "11");
+            let tokenResult = await server.authenticate({token:token.accessToken + "11"});
 
             tokenResult.should.not.be.ok;
 
