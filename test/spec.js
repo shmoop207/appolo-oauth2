@@ -258,7 +258,7 @@ describe("OAuth2Server Spec", function () {
         name.should.be.eq("aaaa");
         pass.should.be.eq("Fy9QfXhPXWAcMaWP");
     });
-    it.only("should should bump lifeTime", async () => {
+    it("should  bump lifeTime", async () => {
         let clock;
         let server = await index_1.createOAuth2Server({ model: new testModel_1.TestModel(), bumpLifeTime: true });
         let token = await server.login({
@@ -284,6 +284,29 @@ describe("OAuth2Server Spec", function () {
         (new Date(tokenResult.refreshTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gte(120000);
         (new Date(tokenResult.accessTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gte(60000);
         clock.restore();
+    });
+    it("should validate scope", async () => {
+        let server = await index_1.createOAuth2Server({ model: new testModel_1.TestModel(), bumpLifeTime: true });
+        let token = await server.login({
+            scope: ["scopeTest"],
+            clientId: "aa",
+            clientSecret: "bb",
+            username: "ccc",
+            password: "ddd", accessTokenLifetime: 60, refreshTokenLifetime: 120
+        });
+        token.should.be.ok;
+        let tokenResult = await server.authenticate({ token: token.accessToken, scope: ["scopeTest"] });
+        tokenResult.accessToken.should.be.ok;
+        try {
+            let tokenResult = await server.authenticate({ token: token.accessToken, scope: ["scopeTest2"] });
+            tokenResult.accessToken.should.not.be.ok;
+        }
+        catch (e) {
+            e.should.be.ok;
+            e.name.should.be.eq("insufficient_scope");
+            e.message.should.be.eq("Insufficient scope: authorized scope is insufficient");
+            e.code.should.be.eq(403);
+        }
     });
 });
 //# sourceMappingURL=spec.js.map

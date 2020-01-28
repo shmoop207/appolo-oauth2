@@ -14,8 +14,15 @@ let AuthenticateHandler = class AuthenticateHandler {
         }
         let accessToken = await this._getToken(opts);
         this._validateToken(accessToken);
-        await Promise.all([this._verifyScope(accessToken, opts.scope), this._verifyScope(accessToken, this.options.scopes)]);
+        await this._verifyScope(accessToken, this.options.scopes);
+        this._validateTokenScope(accessToken, opts.scope);
         return accessToken;
+    }
+    _validateTokenScope(token, scope) {
+        if (scope && scope.length && token.scope && !scope.every(s => token.scope.includes(s))) {
+            throw new insufficientScopeError_1.InsufficientScopeError('Insufficient scope: authorized scope is insufficient');
+        }
+        return true;
     }
     async _getToken(opts) {
         let promise = this.options.model.getAccessToken(opts.token);
