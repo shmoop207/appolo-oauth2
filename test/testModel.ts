@@ -34,14 +34,14 @@ export class TestModel implements IPasswordModel, IAuthenticationModel, IRefresh
         }
     }
 
-    async revokeToken(token: IToken): Promise<boolean> {
+    async revokeAccessToken(token: IToken): Promise<boolean> {
 
         delete this._tokens[token.accessToken];
 
         return true;
     }
 
-    async saveToken(token: IToken, client: IClient, user: IUser): Promise<IToken | Falsey> {
+    async saveAccessToken(token: IToken, client: IClient, user: IUser): Promise<IToken | Falsey> {
 
         this._tokens[token.accessToken] = token;
 

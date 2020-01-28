@@ -135,7 +135,7 @@ export class TokensHelper {
 
     public async saveAccessToken(token: IToken, client: IClient, user: IUser): Promise<IToken> {
 
-        let promise = (this.options.model as IPasswordModel).saveToken(token, client, user);
+        let promise = (this.options.model as IPasswordModel).saveAccessToken(token, client, user);
 
         let [err, validToken] = await Promises.to(promise);
 
@@ -187,7 +187,7 @@ export class TokensHelper {
     public async revokeAccessToken(token: IToken) {
         let model = this.options.model as IPasswordModel;
 
-        let promise = model.revokeToken(token);
+        let promise = model.revokeAccessToken(token);
 
         let [err, result] = await Promises.to(promise);
 

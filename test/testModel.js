@@ -21,11 +21,11 @@ class TestModel {
             return { userName: "test" };
         }
     }
-    async revokeToken(token) {
+    async revokeAccessToken(token) {
         delete this._tokens[token.accessToken];
         return true;
     }
-    async saveToken(token, client, user) {
+    async saveAccessToken(token, client, user) {
         this._tokens[token.accessToken] = token;
         return token;
     }
