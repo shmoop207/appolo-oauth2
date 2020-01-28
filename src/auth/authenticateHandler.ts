@@ -28,7 +28,7 @@ export class AuthenticateHandler {
 
         this._validateToken(accessToken);
 
-        await this._verifyScope(accessToken);
+        await Promise.all([this._verifyScope(accessToken, opts.scope), this._verifyScope(accessToken, this.options.scopes)]);
 
         return accessToken;
     }
@@ -47,7 +47,7 @@ export class AuthenticateHandler {
             throw new InvalidTokenError('Invalid token: access token is invalid');
         }
 
-        if ( this.options.bumpLifeTime) {
+        if (this.options.bumpLifeTime) {
             accessToken = await this._bumpLifetime(accessToken)
         }
 
@@ -55,13 +55,13 @@ export class AuthenticateHandler {
 
     }
 
-    private async _verifyScope(token: IToken) {
+    private async _verifyScope(token: IToken, scopes: string[]) {
 
-        if (!this.options.scopes || !this.options.scopes.length) {
+        if (!scopes || !scopes.length) {
             return
         }
 
-        let promise = (this.options.model as IAuthenticationModel).verifyScope(token, this.options.scopes);
+        let promise = (this.options.model as IAuthenticationModel).verifyScope(token, scopes);
 
         let [err, result] = await Promises.to(promise);
 

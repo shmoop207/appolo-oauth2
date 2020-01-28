@@ -29,9 +29,9 @@ export interface IPasswordModel extends IBaseModel {
 
     validateScope?(user: IUser, client: IClient, scope: string[]): Promise<string[] | Falsey>;
 
-    revokeToken(token: IToken): Promise<boolean>;
+    revokeAccessToken(token: IToken): Promise<boolean>;
 
-    saveToken(token: IToken, client: IClient, user: IUser): Promise<IToken | Falsey>;
+    saveAccessToken(token: IToken, client: IClient, user: IUser): Promise<IToken | Falsey>;
 }
 
 export interface IRefreshTokenModel extends IBaseModel {

@@ -14,7 +14,7 @@ let AuthenticateHandler = class AuthenticateHandler {
         }
         let accessToken = await this._getToken(opts);
         this._validateToken(accessToken);
-        await this._verifyScope(accessToken);
+        await Promise.all([this._verifyScope(accessToken, opts.scope), this._verifyScope(accessToken, this.options.scopes)]);
         return accessToken;
     }
     async _getToken(opts) {
@@ -31,11 +31,11 @@ let AuthenticateHandler = class AuthenticateHandler {
         }
         return accessToken;
     }
-    async _verifyScope(token) {
-        if (!this.options.scopes || !this.options.scopes.length) {
+    async _verifyScope(token, scopes) {
+        if (!scopes || !scopes.length) {
             return;
         }
-        let promise = this.options.model.verifyScope(token, this.options.scopes);
+        let promise = this.options.model.verifyScope(token, scopes);
         let [err, result] = await appolo_utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError('Server error: `failed to` must be a Date instance');

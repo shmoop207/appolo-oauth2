@@ -1,6 +1,6 @@
 export class Utils {
     public static getTokenFromBearer(authorization: string): string {
-        return authorization.split("Bearer ")[1];
+        return (authorization || "").split("Bearer ")[1];
     }
 
     public static parseAuthorization(authorization: string): { name: string, pass: string } {
