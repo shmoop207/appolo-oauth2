@@ -333,7 +333,7 @@ describe("OAuth2Server Spec", function () {
         pass.should.be.eq("Fy9QfXhPXWAcMaWP")
     });
 
-    it.only("should  bump lifeTime", async () => {
+    it("should  bump lifeTime", async () => {
         let clock;
         let server = await createOAuth2Server({model: new TestModel(), bumpLifeTime: true,bumpLifeTimeMinDiff:0});
 

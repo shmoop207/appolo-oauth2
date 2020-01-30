@@ -86,7 +86,7 @@ let TokensHelper = class TokensHelper {
         return token;
     }
     async saveAccessToken(token, client, user) {
-        let promise = this.options.model.saveAccessToken(token, client, user);
+        let promise = this.options.model.saveAccessToken(Object.assign({}, token), Object.assign({}, client), Object.assign({}, user));
         let [err, validToken] = await appolo_utils_2.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`);
@@ -97,7 +97,7 @@ let TokensHelper = class TokensHelper {
         return validToken;
     }
     async saveTokenRefresh(token, client, user) {
-        let promise = this.options.model.saveRefreshToken(token, client, user);
+        let promise = this.options.model.saveRefreshToken(Object.assign({}, token), Object.assign({}, client), Object.assign({}, user));
         let [err, validToken] = await appolo_utils_2.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`);
