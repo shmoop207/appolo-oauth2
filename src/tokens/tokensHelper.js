@@ -49,7 +49,9 @@ let TokensHelper = class TokensHelper {
         if (this.options.useRefreshToken) {
             token.refreshTokenExpiresAt = refreshToken.refreshTokenExpiresAt;
             token.refreshToken = refreshToken.refreshToken;
-            (this.options.bumpLifeTime) && (token.refreshTokenLifetime = this.getRefreshTokenLifetime(opts.refreshTokenLifetime, opts.client));
+            if (this.options.bumpLifeTime) {
+                token.refreshTokenLifetime = refreshToken.refreshTokenLifetime = this.getRefreshTokenLifetime(opts.refreshTokenLifetime, opts.client);
+            }
         }
         [token, refreshToken] = await this.saveTokens(token, refreshToken, opts.client, opts.user);
         return token;
