@@ -11,6 +11,7 @@ import {InvalidGrantError} from "../common/errors/invalidGrantError";
 import {ClientHandler} from "../clients/clientHandler";
 import {UnauthorizedClientError} from "../common/errors/unauthorizedClientError";
 import {GrantType} from "../common/enums";
+import {AuthenticateHandler} from "../auth/authenticateHandler";
 
 @define()
 @singleton()
@@ -19,6 +20,7 @@ export class TokensHelper {
     @inject() private options: IOptions;
 
     @inject() clientHandler: ClientHandler;
+    @inject() authenticateHandler: AuthenticateHandler;
 
 
     public async generateAccessToken(opts: { client: IClient, user: IUser, scopes: string[] }): Promise<string> {
@@ -92,6 +94,8 @@ export class TokensHelper {
         }
 
         [token, refreshToken] = await this.saveTokens(token, refreshToken, opts.client, opts.user);
+
+        token = await this.authenticateHandler.getToken({token: token.accessToken, scope: opts.scopes})
 
         return token as IToken;
     }

@@ -54,6 +54,7 @@ let TokensHelper = class TokensHelper {
             }
         }
         [token, refreshToken] = await this.saveTokens(token, refreshToken, opts.client, opts.user);
+        token = await this.authenticateHandler.getToken({ token: token.accessToken, scope: opts.scopes });
         return token;
     }
     saveTokens(token, refreshToken, client, user) {
@@ -135,6 +136,9 @@ tslib_1.__decorate([
 tslib_1.__decorate([
     appolo_engine_1.inject()
 ], TokensHelper.prototype, "clientHandler", void 0);
+tslib_1.__decorate([
+    appolo_engine_1.inject()
+], TokensHelper.prototype, "authenticateHandler", void 0);
 TokensHelper = tslib_1.__decorate([
     appolo_engine_1.define(),
     appolo_engine_1.singleton()

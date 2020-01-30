@@ -31,6 +31,10 @@ export class AuthenticateHandler {
 
         this._validateTokenScope(accessToken, opts.scope);
 
+        if (this.options.bumpLifeTime) {
+            await this._bumpLifetime(accessToken)
+        }
+
         return accessToken;
     }
 
@@ -54,10 +58,6 @@ export class AuthenticateHandler {
 
         if (!accessToken) {
             throw new InvalidTokenError('Invalid token: access token is invalid');
-        }
-
-        if (this.options.bumpLifeTime) {
-            accessToken = await this._bumpLifetime(accessToken)
         }
 
         return accessToken as IToken;
