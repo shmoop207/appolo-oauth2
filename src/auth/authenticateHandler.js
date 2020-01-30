@@ -60,10 +60,17 @@ let AuthenticateHandler = class AuthenticateHandler {
         }
     }
     async _bumpLifetime(token) {
-        token.accessTokenLifetime && (token.accessTokenExpiresAt = this.tokensHelper.getExpireDate(token.accessTokenLifetime));
-        token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
-        let [accessToken] = await this.tokensHelper.saveTokens(token, token, token.client, token.user);
-        return accessToken;
+        if (!token.accessTokenLifetime) {
+            return token;
+        }
+        let newAccessTokenLifetime = this.tokensHelper.getExpireDate(token.accessTokenLifetime);
+        let diff = Date.now() - token.accessTokenExpiresAt.getTime();
+        if (diff >= (this.options.bumpLifeTimeMinDiff * 1000)) {
+            token.accessTokenLifetime && (token.accessTokenExpiresAt = newAccessTokenLifetime);
+            token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
+            [token] = await this.tokensHelper.saveTokens(token, token, token.client, token.user);
+        }
+        return token;
     }
 };
 tslib_1.__decorate([

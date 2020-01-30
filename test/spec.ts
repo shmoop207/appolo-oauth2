@@ -335,7 +335,7 @@ describe("OAuth2Server Spec", function () {
 
     it("should  bump lifeTime", async () => {
         let clock;
-        let server = await createOAuth2Server({model: new TestModel(), bumpLifeTime: true});
+        let server = await createOAuth2Server({model: new TestModel(), bumpLifeTime: true,bumpLifeTimeMinDiff:0});
 
         let token = await server.login({
             scope: ["scopeTest"],

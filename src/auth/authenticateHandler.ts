@@ -95,12 +95,24 @@ export class AuthenticateHandler {
 
     private async _bumpLifetime(token: IToken): Promise<IToken> {
 
-        token.accessTokenLifetime && (token.accessTokenExpiresAt = this.tokensHelper.getExpireDate(token.accessTokenLifetime));
-        token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
+        if (!token.accessTokenLifetime) {
+            return token
+        }
 
-        let [accessToken] = await this.tokensHelper.saveTokens(token, token, token.client, token.user);
+        let newAccessTokenLifetime = this.tokensHelper.getExpireDate(token.accessTokenLifetime);
 
-        return accessToken;
+        let diff = Date.now() - token.accessTokenExpiresAt.getTime();
+
+        if (diff >= (this.options.bumpLifeTimeMinDiff * 1000)) {
+
+            token.accessTokenLifetime && (token.accessTokenExpiresAt = newAccessTokenLifetime);
+            token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
+
+            [token] = await this.tokensHelper.saveTokens(token, token, token.client, token.user);
+        }
+
+
+        return token;
 
     }
 
