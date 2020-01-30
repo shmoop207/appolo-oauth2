@@ -18,7 +18,7 @@ export class TestModel implements IPasswordModel, IAuthenticationModel, IRefresh
 
     async getClient(clientId: string, clientSecret: string): Promise<IClient | Falsey> {
         if (clientId == "aa" && clientSecret == "bb") {
-            return {grants: ["password","refreshToken"], id: "111"}
+            return {grants: ["password","refresh_token"], id: "111"}
         }
     }
 

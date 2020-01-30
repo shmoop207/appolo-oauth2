@@ -101,7 +101,7 @@ export class AuthenticateHandler {
 
         let newAccessTokenLifetime = this.tokensHelper.getExpireDate(token.accessTokenLifetime);
 
-        let diff = Date.now() - token.accessTokenExpiresAt.getTime();
+        let diff = Math.abs(Date.now() - token.accessTokenExpiresAt.getTime());
 
         if (diff >= (this.options.bumpLifeTimeMinDiff * 1000)) {
 

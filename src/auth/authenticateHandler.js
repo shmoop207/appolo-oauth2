@@ -64,7 +64,7 @@ let AuthenticateHandler = class AuthenticateHandler {
             return token;
         }
         let newAccessTokenLifetime = this.tokensHelper.getExpireDate(token.accessTokenLifetime);
-        let diff = Date.now() - token.accessTokenExpiresAt.getTime();
+        let diff = Math.abs(Date.now() - token.accessTokenExpiresAt.getTime());
         if (diff >= (this.options.bumpLifeTimeMinDiff * 1000)) {
             token.accessTokenLifetime && (token.accessTokenExpiresAt = newAccessTokenLifetime);
             token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));

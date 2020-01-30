@@ -8,7 +8,7 @@ class TestModel {
     }
     async getClient(clientId, clientSecret) {
         if (clientId == "aa" && clientSecret == "bb") {
-            return { grants: ["password", "refreshToken"], id: "111" };
+            return { grants: ["password", "refresh_token"], id: "111" };
         }
     }
     async validateScope(user, client, scope) {

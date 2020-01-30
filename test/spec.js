@@ -258,7 +258,7 @@ describe("OAuth2Server Spec", function () {
         name.should.be.eq("aaaa");
         pass.should.be.eq("Fy9QfXhPXWAcMaWP");
     });
-    it("should  bump lifeTime", async () => {
+    it.only("should  bump lifeTime", async () => {
         let clock;
         let server = await index_1.createOAuth2Server({ model: new testModel_1.TestModel(), bumpLifeTime: true, bumpLifeTimeMinDiff: 0 });
         let token = await server.login({
@@ -273,7 +273,7 @@ describe("OAuth2Server Spec", function () {
         token.accessTokenLifetime.should.be.eq(60);
         token.refreshTokenLifetime.should.be.eq(120);
         let now = new Date();
-        now.setSeconds(now.getSeconds() + (60));
+        now.setSeconds(now.getSeconds() + (40));
         clock = sinon.useFakeTimers({
             now: now,
             shouldAdvanceTime: true,

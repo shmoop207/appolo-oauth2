@@ -333,7 +333,7 @@ describe("OAuth2Server Spec", function () {
         pass.should.be.eq("Fy9QfXhPXWAcMaWP")
     });
 
-    it("should  bump lifeTime", async () => {
+    it.only("should  bump lifeTime", async () => {
         let clock;
         let server = await createOAuth2Server({model: new TestModel(), bumpLifeTime: true,bumpLifeTimeMinDiff:0});
 
@@ -353,7 +353,7 @@ describe("OAuth2Server Spec", function () {
 
         let now = new Date();
 
-        now.setSeconds(now.getSeconds() + (60));
+        now.setSeconds(now.getSeconds() + (40));
 
         clock = sinon.useFakeTimers({
             now: now,
