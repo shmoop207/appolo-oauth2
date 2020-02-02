@@ -22,9 +22,8 @@ export class RefreshGrantHandler {
     @inject() clientHandler: ClientHandler;
 
 
-    public async refreshToken(params: IRefreshParams): Promise<IToken> {
+    public async refreshToken( {revokeToken= true,refreshToken, scope, clientSecret, clientId,refreshTokenLifetime,accessTokenLifetime}:IRefreshParams): Promise<IToken> {
 
-        let {refreshToken, scope, clientSecret, clientId} = params;
 
         let client = await this.clientHandler.getClient({
             clientId,
@@ -37,14 +36,16 @@ export class RefreshGrantHandler {
 
         this._validateToken(refreshTokenDb, client);
 
-        await this.tokensHelper.revokeRefreshToken(refreshTokenDb);
+        if(revokeToken){
+            await this.tokensHelper.revokeRefreshToken(refreshTokenDb);
+        }
 
         let token = await this.tokensHelper.createTokens({
             scopes: refreshTokenDb.scope,
             client: client,
             user: refreshTokenDb.user,
-            refreshTokenLifetime: params.refreshTokenLifetime,
-            accessTokenLifetime: params.accessTokenLifetime
+            refreshTokenLifetime: refreshTokenLifetime,
+            accessTokenLifetime: accessTokenLifetime
         });
 
         return token;

@@ -7,8 +7,7 @@ const serverError_1 = require("../common/errors/serverError");
 const appolo_utils_1 = require("appolo-utils");
 const enums_1 = require("../common/enums");
 let RefreshGrantHandler = class RefreshGrantHandler {
-    async refreshToken(params) {
-        let { refreshToken, scope, clientSecret, clientId } = params;
+    async refreshToken({ revokeToken = true, refreshToken, scope, clientSecret, clientId, refreshTokenLifetime, accessTokenLifetime }) {
         let client = await this.clientHandler.getClient({
             clientId,
             clientSecret,
@@ -17,13 +16,15 @@ let RefreshGrantHandler = class RefreshGrantHandler {
         });
         let refreshTokenDb = await this._getRefreshToken(refreshToken);
         this._validateToken(refreshTokenDb, client);
-        await this.tokensHelper.revokeRefreshToken(refreshTokenDb);
+        if (revokeToken) {
+            await this.tokensHelper.revokeRefreshToken(refreshTokenDb);
+        }
         let token = await this.tokensHelper.createTokens({
             scopes: refreshTokenDb.scope,
             client: client,
             user: refreshTokenDb.user,
-            refreshTokenLifetime: params.refreshTokenLifetime,
-            accessTokenLifetime: params.accessTokenLifetime
+            refreshTokenLifetime: refreshTokenLifetime,
+            accessTokenLifetime: accessTokenLifetime
         });
         return token;
     }

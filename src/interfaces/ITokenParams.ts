@@ -21,6 +21,7 @@ export interface ILoginParams extends IBaseParams, ITokenLifetimeParams {
 export interface IRefreshParams extends IBaseParams, ITokenLifetimeParams {
 
     refreshToken: string,
+    revokeToken?: boolean
 
 }
 
