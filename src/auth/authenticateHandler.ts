@@ -108,6 +108,7 @@ export class AuthenticateHandler {
             token.accessTokenLifetime && (token.accessTokenExpiresAt = newAccessTokenLifetime);
             token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
 
+
             [token] = await this.tokensHelper.saveTokens(token, token, token.client, token.user);
         }
 

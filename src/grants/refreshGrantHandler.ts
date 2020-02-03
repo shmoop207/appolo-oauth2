@@ -22,7 +22,7 @@ export class RefreshGrantHandler {
     @inject() clientHandler: ClientHandler;
 
 
-    public async refreshToken( {revokeToken= true,refreshToken, scope, clientSecret, clientId,refreshTokenLifetime,accessTokenLifetime}:IRefreshParams): Promise<IToken> {
+    public async refreshToken({revokeToken = true, refreshToken, scope, clientSecret, clientId, refreshTokenLifetime, accessTokenLifetime}: IRefreshParams): Promise<IToken> {
 
 
         let client = await this.clientHandler.getClient({
@@ -36,7 +36,7 @@ export class RefreshGrantHandler {
 
         this._validateToken(refreshTokenDb, client);
 
-        if(revokeToken){
+        if (revokeToken) {
             await this.tokensHelper.revokeRefreshToken(refreshTokenDb);
         }
 
@@ -62,7 +62,7 @@ export class RefreshGrantHandler {
             throw new ServerError('Server error: `getRefreshToken()` did not return a `user`');
         }
 
-        if (token.client.id !== client.id) {
+        if (token.client.id !== client.id && token.client._id !== client._id) {
             throw new InvalidGrantError('Invalid grant: refresh token is invalid');
         }
 

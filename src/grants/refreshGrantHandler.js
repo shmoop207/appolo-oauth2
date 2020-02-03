@@ -35,7 +35,7 @@ let RefreshGrantHandler = class RefreshGrantHandler {
         if (!token.user) {
             throw new serverError_1.ServerError('Server error: `getRefreshToken()` did not return a `user`');
         }
-        if (token.client.id !== client.id) {
+        if (token.client.id !== client.id && token.client._id !== client._id) {
             throw new invalidGrantError_1.InvalidGrantError('Invalid grant: refresh token is invalid');
         }
         if (token.refreshTokenExpiresAt && !(token.refreshTokenExpiresAt instanceof Date)) {
