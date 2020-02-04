@@ -1,4 +1,4 @@
-import {IToken} from "../interfaces/IToken";
+import {IRefreshToken, IToken} from "../interfaces/IToken";
 import {define, singleton, inject} from "appolo-engine";
 import {IOptions} from "../interfaces/IOptions";
 import {IAuthenticationModel} from "../interfaces/IModel";
@@ -9,6 +9,7 @@ import {UnauthorizedRequestError} from "../common/errors/unauthorizedRequestErro
 import {InsufficientScopeError} from "../common/errors/insufficientScopeError";
 import {IAuthenticateParams} from "../interfaces/ITokenParams";
 import {TokensHelper} from "../tokens/tokensHelper";
+import * as _ from "lodash";
 
 @define()
 @singleton()
@@ -108,10 +109,10 @@ export class AuthenticateHandler {
             token.accessTokenLifetime && (token.accessTokenExpiresAt = newAccessTokenLifetime);
             token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
 
+            let refresh = _.omit(token, ["accessTokenLifetime", "accessToken", "accessTokenExpiresAt"]) as IRefreshToken;
 
-            [token] = await this.tokensHelper.saveTokens(token, token, token.client, token.user);
+            [token] = await this.tokensHelper.saveTokens(token, refresh, token.client, token.user);
         }
-
 
         return token;
 

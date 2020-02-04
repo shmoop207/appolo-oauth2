@@ -7,6 +7,7 @@ const serverError_1 = require("../common/errors/serverError");
 const invalidTokenError_1 = require("../common/errors/invalidTokenError");
 const unauthorizedRequestError_1 = require("../common/errors/unauthorizedRequestError");
 const insufficientScopeError_1 = require("../common/errors/insufficientScopeError");
+const _ = require("lodash");
 let AuthenticateHandler = class AuthenticateHandler {
     async getToken(opts) {
         if (!opts.token) {
@@ -68,7 +69,8 @@ let AuthenticateHandler = class AuthenticateHandler {
         if (diff >= (this.options.bumpLifeTimeMinDiff * 1000)) {
             token.accessTokenLifetime && (token.accessTokenExpiresAt = newAccessTokenLifetime);
             token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
-            [token] = await this.tokensHelper.saveTokens(token, token, token.client, token.user);
+            let refresh = _.omit(token, ["accessTokenLifetime", "accessToken", "accessTokenExpiresAt"]);
+            [token] = await this.tokensHelper.saveTokens(token, refresh, token.client, token.user);
         }
         return token;
     }
