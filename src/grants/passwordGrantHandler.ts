@@ -50,7 +50,8 @@ export class PasswordGruntHandler {
             client,
             scopes,
             refreshTokenLifetime: params.refreshTokenLifetime,
-            accessTokenLifetime: params.accessTokenLifetime
+            accessTokenLifetime: params.accessTokenLifetime,
+            params: params.params
         });
 
         return token;

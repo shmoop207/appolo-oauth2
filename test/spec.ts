@@ -55,6 +55,22 @@ describe("OAuth2Server Spec", function () {
 
     });
 
+    it("should get token with params", async () => {
+
+        let token = await server.login({
+            scope: ["scopeTest"],
+            clientId: "aa",
+            clientSecret: "bb",
+            username: "ccc",
+            password: "ddd",
+            params: {test: 1}
+        });
+
+        token.accessToken.should.be.ok;
+
+        token.params.test.should.be.eq(1);
+    })
+
     it("should throw invalid client", async () => {
 
         try {
@@ -335,7 +351,7 @@ describe("OAuth2Server Spec", function () {
 
     it("should  bump lifeTime", async () => {
         let clock;
-        let server = await createOAuth2Server({model: new TestModel(), bumpLifeTime: true,bumpLifeTimeMinDiff:0});
+        let server = await createOAuth2Server({model: new TestModel(), bumpLifeTime: true, bumpLifeTimeMinDiff: 0});
 
         let token = await server.login({
             scope: ["scopeTest"],
@@ -385,17 +401,17 @@ describe("OAuth2Server Spec", function () {
 
         token.should.be.ok;
 
-        let tokenResult = await server.authenticate({token: token.accessToken,scope:["scopeTest"]});
+        let tokenResult = await server.authenticate({token: token.accessToken, scope: ["scopeTest"]});
 
         tokenResult.accessToken.should.be.ok;
 
-        try{
-            let tokenResult = await server.authenticate({token: token.accessToken,scope:["scopeTest2"]});
+        try {
+            let tokenResult = await server.authenticate({token: token.accessToken, scope: ["scopeTest2"]});
 
             tokenResult.accessToken.should.not.be.ok;
 
 
-        }catch (e) {
+        } catch (e) {
             e.should.be.ok;
             e.name.should.be.eq("insufficient_scope");
             e.message.should.be.eq("Insufficient scope: authorized scope is insufficient");
@@ -403,7 +419,6 @@ describe("OAuth2Server Spec", function () {
         }
 
     });
-
 
 
 });

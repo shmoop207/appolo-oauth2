@@ -33,6 +33,18 @@ describe("OAuth2Server Spec", function () {
         (new Date(token.refreshTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gt(7000000);
         (new Date(token.accessTokenExpiresAt).valueOf() - new Date().valueOf()).should.be.gt(3500000);
     });
+    it("should get token with params", async () => {
+        let token = await server.login({
+            scope: ["scopeTest"],
+            clientId: "aa",
+            clientSecret: "bb",
+            username: "ccc",
+            password: "ddd",
+            params: { test: 1 }
+        });
+        token.accessToken.should.be.ok;
+        token.params.test.should.be.eq(1);
+    });
     it("should throw invalid client", async () => {
         try {
             let token = await server.login({

@@ -15,6 +15,7 @@ export interface ILoginParams extends IBaseParams, ITokenLifetimeParams {
 
     username: string,
     password: string,
+    params?: { [index: string]: any }
 
 }
 

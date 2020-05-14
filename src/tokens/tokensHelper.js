@@ -70,7 +70,8 @@ let TokensHelper = class TokensHelper {
             accessTokenExpiresAt: this.getAccessTokenExpiresAt(opts.accessTokenLifetime, opts.client),
             client: opts.client,
             scope: opts.scopes,
-            user: opts.user
+            user: opts.user,
+            params: opts.params
         };
         return token;
     }
@@ -81,7 +82,8 @@ let TokensHelper = class TokensHelper {
             scope: opts.scopes,
             refreshToken: refreshToken,
             refreshTokenExpiresAt: this.getRefreshTokenExpiresAt(opts.refreshTokenLifetime, opts.client),
-            user: opts.user
+            user: opts.user,
+            params: opts.params
         };
         return token;
     }
