@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ClientHandler = void 0;
 const tslib_1 = require("tslib");
 const appolo_engine_1 = require("appolo-engine");
 const invalidClientError_1 = require("../common/errors/invalidClientError");

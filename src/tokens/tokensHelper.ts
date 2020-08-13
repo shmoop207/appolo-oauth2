@@ -75,7 +75,7 @@ export class TokensHelper {
         return expires;
     }
 
-    public async createTokens(opts: { client: IClient, user: IUser, scopes: string[], accessTokenLifetime: number, refreshTokenLifetime: number, params: { [index: string]: any } }): Promise<IToken> {
+    public async createTokens(opts: { client: IClient, user: IUser, scopes: string[], accessTokenLifetime: number, refreshTokenLifetime: number, params?: { [index: string]: any } }): Promise<IToken> {
 
 
         let [token, refreshToken] = await Promise.all<IToken, IRefreshToken>([
@@ -109,7 +109,7 @@ export class TokensHelper {
     }
 
 
-    private async _createAccessToken(opts: { client: IClient, user: IUser, scopes: string[], accessTokenLifetime: number, params: { [index: string]: any } }): Promise<IToken> {
+    private async _createAccessToken(opts: { client: IClient, user: IUser, scopes: string[], accessTokenLifetime: number, params?: { [index: string]: any } }): Promise<IToken> {
 
         let accessToken = await this.generateAccessToken(opts);
 
@@ -125,7 +125,7 @@ export class TokensHelper {
         return token;
     }
 
-    public async createRefreshToken(opts: { client: IClient, user: IUser, scopes: string[], refreshTokenLifetime: number, params: { [index: string]: any } }): Promise<IRefreshToken> {
+    public async createRefreshToken(opts: { client: IClient, user: IUser, scopes: string[], refreshTokenLifetime: number, params?: { [index: string]: any } }): Promise<IRefreshToken> {
 
         let refreshToken = await this.generateRefreshToken(opts);
 

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.InvalidRequestError = void 0;
 class InvalidRequestError extends Error {
     constructor(message) {
         super();

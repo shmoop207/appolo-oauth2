@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RefreshGrantHandler = void 0;
 const tslib_1 = require("tslib");
 const appolo_engine_1 = require("appolo-engine");
 const invalidGrantError_1 = require("../common/errors/invalidGrantError");

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TestModel = void 0;
 const appolo_utils_1 = require("appolo-utils");
 class TestModel {
     constructor() {

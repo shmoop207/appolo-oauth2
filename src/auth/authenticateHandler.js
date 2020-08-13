@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuthenticateHandler = void 0;
 const tslib_1 = require("tslib");
 const appolo_engine_1 = require("appolo-engine");
 const appolo_utils_1 = require("appolo-utils");
@@ -7,7 +8,7 @@ const serverError_1 = require("../common/errors/serverError");
 const invalidTokenError_1 = require("../common/errors/invalidTokenError");
 const unauthorizedRequestError_1 = require("../common/errors/unauthorizedRequestError");
 const insufficientScopeError_1 = require("../common/errors/insufficientScopeError");
-const _ = require("lodash");
+const appolo_utils_2 = require("appolo-utils");
 let AuthenticateHandler = class AuthenticateHandler {
     async getToken(opts) {
         if (!opts.token) {
@@ -69,7 +70,7 @@ let AuthenticateHandler = class AuthenticateHandler {
         if (diff >= (this.options.bumpLifeTimeMinDiff * 1000)) {
             token.accessTokenLifetime && (token.accessTokenExpiresAt = newAccessTokenLifetime);
             token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
-            let refresh = _.omit(token, ["accessTokenLifetime", "accessToken", "accessTokenExpiresAt"]);
+            let refresh = appolo_utils_2.Objects.omit(token, "accessTokenLifetime", "accessToken", "accessTokenExpiresAt");
             [token] = await this.tokensHelper.saveTokens(token, refresh, token.client, token.user);
         }
         return token;
