@@ -1,6 +1,6 @@
 import {define, singleton, alias, inject} from "appolo-engine";
 import {IOptions} from "../interfaces/IOptions";
-import {IPasswordModel, IRefreshTokenModel} from "../interfaces/IModel";
+import {Falsey, IPasswordModel, IRefreshTokenModel} from "../interfaces/IModel";
 import {InvalidGrantError} from "../common/errors/invalidGrantError";
 import {ServerError} from "../common/errors/serverError";
 import {TokensHelper} from "../tokens/tokensHelper";
@@ -79,10 +79,10 @@ export class RefreshGrantHandler {
 
         let promise = (this.options.model as IRefreshTokenModel).getRefreshToken(token);
 
-        let [err, refreshToken] = await Promises.to(promise);
+        let [err, refreshToken] = await Promises.to<IRefreshToken | Falsey,Error>(promise);
 
         if (err) {
-            throw new ServerError(`server error: ${(err || "").toString()}`)
+            throw new ServerError(`server error: ${(err || "").toString()}`,err)
         }
 
         if (!refreshToken) {

@@ -92,7 +92,7 @@ let TokensHelper = class TokensHelper {
         let promise = this.options.model.saveAccessToken(Object.assign({}, token), Object.assign({}, client), Object.assign({}, user));
         let [err, validToken] = await appolo_utils_2.Promises.to(promise);
         if (err) {
-            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`);
+            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
         if (!validToken) {
             throw new serverError_1.ServerError(`server error: failed to save token}`);
@@ -103,7 +103,7 @@ let TokensHelper = class TokensHelper {
         let promise = this.options.model.saveRefreshToken(Object.assign({}, token), Object.assign({}, client), Object.assign({}, user));
         let [err, validToken] = await appolo_utils_2.Promises.to(promise);
         if (err) {
-            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`);
+            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
         if (!validToken) {
             throw new serverError_1.ServerError(`server error: failed to save refresh token}`);
@@ -115,7 +115,7 @@ let TokensHelper = class TokensHelper {
         let promise = model.revokeRefreshToken(token);
         let [err, result] = await appolo_utils_2.Promises.to(promise);
         if (err) {
-            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`);
+            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
         if (!result) {
             throw new invalidGrantError_1.InvalidGrantError('Invalid grant: failed to revoke token');
@@ -126,7 +126,7 @@ let TokensHelper = class TokensHelper {
         let promise = model.revokeAccessToken(token);
         let [err, result] = await appolo_utils_2.Promises.to(promise);
         if (err) {
-            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`);
+            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
         if (!result) {
             throw new invalidGrantError_1.InvalidGrantError('Invalid grant: failed to token');

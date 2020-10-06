@@ -4,7 +4,7 @@ import {IOptions} from "../interfaces/IOptions";
 import {IClient} from "../interfaces/IClient";
 import {IUser} from "../interfaces/IUser";
 import {IRefreshToken, IToken} from "../interfaces/IToken";
-import {IPasswordModel, IRefreshTokenModel} from "../interfaces/IModel";
+import {Falsey, IPasswordModel, IRefreshTokenModel} from "../interfaces/IModel";
 import {ServerError} from "../common/errors/serverError";
 import {Promises} from "appolo-utils";
 import {InvalidGrantError} from "../common/errors/invalidGrantError";
@@ -145,10 +145,10 @@ export class TokensHelper {
 
         let promise = (this.options.model as IPasswordModel).saveAccessToken({...token}, {...client}, {...user});
 
-        let [err, validToken] = await Promises.to(promise);
+        let [err, validToken] = await Promises.to<IToken | Falsey,Error>(promise);
 
         if (err) {
-            throw new ServerError(`server error: ${(err || "").toString()}`)
+            throw new ServerError(`server error: ${(err || "").toString()}`,err)
         }
 
         if (!validToken) {
@@ -163,10 +163,10 @@ export class TokensHelper {
 
         let promise = (this.options.model as IRefreshTokenModel).saveRefreshToken({...token}, {...client}, {...user});
 
-        let [err, validToken] = await Promises.to(promise);
+        let [err, validToken] = await Promises.to<IRefreshToken | Falsey,Error>(promise);
 
         if (err) {
-            throw new ServerError(`server error: ${(err || "").toString()}`)
+            throw new ServerError(`server error: ${(err || "").toString()}`,err)
         }
 
         if (!validToken) {
@@ -181,10 +181,10 @@ export class TokensHelper {
 
         let promise = model.revokeRefreshToken(token);
 
-        let [err, result] = await Promises.to(promise);
+        let [err, result] = await Promises.to<boolean,Error>(promise);
 
         if (err) {
-            throw new ServerError(`server error: ${(err || "").toString()}`)
+            throw new ServerError(`server error: ${(err || "").toString()}`,err)
         }
 
         if (!result) {
@@ -197,10 +197,10 @@ export class TokensHelper {
 
         let promise = model.revokeAccessToken(token);
 
-        let [err, result] = await Promises.to(promise);
+        let [err, result] = await Promises.to<boolean,Error>(promise);
 
         if (err) {
-            throw new ServerError(`server error: ${(err || "").toString()}`)
+            throw new ServerError(`server error: ${(err || "").toString()}`,err)
         }
 
         if (!result) {

@@ -35,7 +35,7 @@ let PasswordGruntHandler = class PasswordGruntHandler {
         let promise = this.options.model.getUser(username, password);
         let [err, user] = await appolo_utils_1.Promises.to(promise);
         if (err) {
-            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`);
+            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
         if (!user) {
             throw new invalidGrantError_1.InvalidGrantError('Invalid grant: user credentials are invalid');
@@ -46,7 +46,7 @@ let PasswordGruntHandler = class PasswordGruntHandler {
         let promise = this.options.model.validateScope(user, client, scopes);
         let [err, validScopes] = await appolo_utils_1.Promises.to(promise);
         if (err) {
-            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`);
+            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
         if (!validScopes || !validScopes.length) {
             throw new invalidScopeError_1.InvalidScopeError('Invalid scope: Requested scope is invalid');

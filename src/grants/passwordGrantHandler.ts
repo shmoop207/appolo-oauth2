@@ -1,6 +1,6 @@
 import {alias, define, inject, singleton} from "appolo-engine";
 import {IOptions} from "../interfaces/IOptions";
-import {IPasswordModel} from "../interfaces/IModel";
+import {Falsey, IPasswordModel} from "../interfaces/IModel";
 import {InvalidGrantError} from "../common/errors/invalidGrantError";
 import {ServerError} from "../common/errors/serverError";
 import {IClient} from "../interfaces/IClient";
@@ -62,10 +62,10 @@ export class PasswordGruntHandler {
 
         let promise = (this.options.model as IPasswordModel).getUser(username, password);
 
-        let [err, user] = await Promises.to(promise);
+        let [err, user] = await Promises.to<IUser | Falsey, Error>(promise);
 
         if (err) {
-            throw new ServerError(`server error: ${(err || "").toString()}`);
+            throw new ServerError(`server error: ${(err || "").toString()}`, err);
         }
 
         if (!user) {
@@ -79,10 +79,10 @@ export class PasswordGruntHandler {
 
         let promise = (this.options.model as IPasswordModel).validateScope(user, client, scopes);
 
-        let [err, validScopes] = await Promises.to(promise);
+        let [err, validScopes] = await Promises.to<string[] | Falsey,Error>(promise);
 
         if (err) {
-            throw new ServerError(`server error: ${(err || "").toString()}`)
+            throw new ServerError(`server error: ${(err || "").toString()}`,err)
         }
 
         if (!validScopes || !validScopes.length) {

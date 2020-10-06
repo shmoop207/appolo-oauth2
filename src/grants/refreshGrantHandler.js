@@ -50,7 +50,7 @@ let RefreshGrantHandler = class RefreshGrantHandler {
         let promise = this.options.model.getRefreshToken(token);
         let [err, refreshToken] = await appolo_utils_1.Promises.to(promise);
         if (err) {
-            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`);
+            throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
         if (!refreshToken) {
             throw new invalidGrantError_1.InvalidGrantError('Invalid grant: refresh token is invalid');

@@ -1,7 +1,7 @@
 import {IRefreshToken, IToken} from "../interfaces/IToken";
 import {define, singleton, inject} from "appolo-engine";
 import {IOptions} from "../interfaces/IOptions";
-import {IAuthenticationModel} from "../interfaces/IModel";
+import {Falsey, IAuthenticationModel} from "../interfaces/IModel";
 import {Promises} from "appolo-utils";
 import {ServerError} from "../common/errors/serverError";
 import {InvalidTokenError} from "../common/errors/invalidTokenError";
@@ -51,10 +51,10 @@ export class AuthenticateHandler {
 
         let promise = (this.options.model as IAuthenticationModel).getAccessToken(opts.token);
 
-        let [err, accessToken] = await Promises.to(promise);
+        let [err, accessToken] = await Promises.to<IToken | Falsey,Error>(promise);
 
         if (err) {
-            throw new ServerError('Server error: `failed to get token');
+            throw new ServerError('Server error: `failed to get token',err);
         }
 
         if (!accessToken) {
@@ -73,10 +73,10 @@ export class AuthenticateHandler {
 
         let promise = (this.options.model as IAuthenticationModel).verifyScope(token, scopes);
 
-        let [err, result] = await Promises.to(promise);
+        let [err, result] = await Promises.to<boolean,Error>(promise);
 
         if (err) {
-            throw new ServerError('Server error: `failed to` must be a Date instance');
+            throw new ServerError('Server error: `failed to` must be a Date instance',err);
         }
 
         if (!result) {

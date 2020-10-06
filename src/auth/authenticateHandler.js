@@ -33,7 +33,7 @@ let AuthenticateHandler = class AuthenticateHandler {
         let promise = this.options.model.getAccessToken(opts.token);
         let [err, accessToken] = await appolo_utils_1.Promises.to(promise);
         if (err) {
-            throw new serverError_1.ServerError('Server error: `failed to get token');
+            throw new serverError_1.ServerError('Server error: `failed to get token', err);
         }
         if (!accessToken) {
             throw new invalidTokenError_1.InvalidTokenError('Invalid token: access token is invalid');
@@ -47,7 +47,7 @@ let AuthenticateHandler = class AuthenticateHandler {
         let promise = this.options.model.verifyScope(token, scopes);
         let [err, result] = await appolo_utils_1.Promises.to(promise);
         if (err) {
-            throw new serverError_1.ServerError('Server error: `failed to` must be a Date instance');
+            throw new serverError_1.ServerError('Server error: `failed to` must be a Date instance', err);
         }
         if (!result) {
             throw new insufficientScopeError_1.InsufficientScopeError('Insufficient scope: authorized scope is insufficient');
