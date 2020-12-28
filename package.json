@@ -28,7 +28,7 @@
   "dependencies": {
     "appolo-engine": "^7.0.7",
     "appolo-event-dispatcher": "^7.0.2",
-    "appolo-utils": "^0.0.60"
+    "appolo-utils": "^0.0.62"
   },
   "devDependencies": {
     "@types/chai": "^4.2.12",
