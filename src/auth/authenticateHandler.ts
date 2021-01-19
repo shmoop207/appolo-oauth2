@@ -1,15 +1,14 @@
 import {IRefreshToken, IToken} from "../interfaces/IToken";
-import {define, singleton, inject} from "appolo-engine";
+import {define, inject, singleton} from "@appolo/inject";
 import {IOptions} from "../interfaces/IOptions";
 import {Falsey, IAuthenticationModel} from "../interfaces/IModel";
-import {Promises} from "appolo-utils";
+import {Promises,Objects} from "@appolo/utils";
 import {ServerError} from "../common/errors/serverError";
 import {InvalidTokenError} from "../common/errors/invalidTokenError";
 import {UnauthorizedRequestError} from "../common/errors/unauthorizedRequestError";
 import {InsufficientScopeError} from "../common/errors/insufficientScopeError";
 import {IAuthenticateParams} from "../interfaces/ITokenParams";
 import {TokensHelper} from "../tokens/tokensHelper";
-import {Objects} from "appolo-utils";
 
 @define()
 @singleton()

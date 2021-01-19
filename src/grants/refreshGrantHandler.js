@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RefreshGrantHandler = void 0;
 const tslib_1 = require("tslib");
-const appolo_engine_1 = require("appolo-engine");
+const inject_1 = require("@appolo/inject");
 const invalidGrantError_1 = require("../common/errors/invalidGrantError");
 const serverError_1 = require("../common/errors/serverError");
-const appolo_utils_1 = require("appolo-utils");
+const utils_1 = require("@appolo/utils");
 const enums_1 = require("../common/enums");
 let RefreshGrantHandler = class RefreshGrantHandler {
     async refreshToken({ revokeToken = true, refreshToken, scope, clientSecret, clientId, refreshTokenLifetime, accessTokenLifetime }) {
@@ -48,7 +48,7 @@ let RefreshGrantHandler = class RefreshGrantHandler {
     }
     async _getRefreshToken(token) {
         let promise = this.options.model.getRefreshToken(token);
-        let [err, refreshToken] = await appolo_utils_1.Promises.to(promise);
+        let [err, refreshToken] = await utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
@@ -59,18 +59,18 @@ let RefreshGrantHandler = class RefreshGrantHandler {
     }
 };
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], RefreshGrantHandler.prototype, "options", void 0);
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], RefreshGrantHandler.prototype, "tokensHelper", void 0);
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], RefreshGrantHandler.prototype, "clientHandler", void 0);
 RefreshGrantHandler = tslib_1.__decorate([
-    appolo_engine_1.define(),
-    appolo_engine_1.singleton(),
-    appolo_engine_1.alias("IGrantHandler")
+    inject_1.define(),
+    inject_1.singleton(),
+    inject_1.alias("IGrantHandler")
 ], RefreshGrantHandler);
 exports.RefreshGrantHandler = RefreshGrantHandler;
 //# sourceMappingURL=refreshGrantHandler.js.map

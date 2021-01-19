@@ -2,12 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PasswordGruntHandler = void 0;
 const tslib_1 = require("tslib");
-const appolo_engine_1 = require("appolo-engine");
+const inject_1 = require("@appolo/inject");
 const invalidGrantError_1 = require("../common/errors/invalidGrantError");
 const serverError_1 = require("../common/errors/serverError");
 const invalidScopeError_1 = require("../common/errors/invalidScopeError");
 const invalidRequestError_1 = require("../common/errors/invalidRequestError");
-const appolo_utils_1 = require("appolo-utils");
+const utils_1 = require("@appolo/utils");
 const enums_1 = require("../common/enums");
 let PasswordGruntHandler = class PasswordGruntHandler {
     async createToken(params) {
@@ -33,7 +33,7 @@ let PasswordGruntHandler = class PasswordGruntHandler {
     }
     async _getUser(username, password) {
         let promise = this.options.model.getUser(username, password);
-        let [err, user] = await appolo_utils_1.Promises.to(promise);
+        let [err, user] = await utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
@@ -44,7 +44,7 @@ let PasswordGruntHandler = class PasswordGruntHandler {
     }
     async _validateScope(user, client, scopes) {
         let promise = this.options.model.validateScope(user, client, scopes);
-        let [err, validScopes] = await appolo_utils_1.Promises.to(promise);
+        let [err, validScopes] = await utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
@@ -55,18 +55,18 @@ let PasswordGruntHandler = class PasswordGruntHandler {
     }
 };
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], PasswordGruntHandler.prototype, "options", void 0);
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], PasswordGruntHandler.prototype, "tokensHelper", void 0);
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], PasswordGruntHandler.prototype, "clientHandler", void 0);
 PasswordGruntHandler = tslib_1.__decorate([
-    appolo_engine_1.define(),
-    appolo_engine_1.singleton(),
-    appolo_engine_1.alias("IGrantHandler")
+    inject_1.define(),
+    inject_1.singleton(),
+    inject_1.alias("IGrantHandler")
 ], PasswordGruntHandler);
 exports.PasswordGruntHandler = PasswordGruntHandler;
 //# sourceMappingURL=passwordGrantHandler.js.map

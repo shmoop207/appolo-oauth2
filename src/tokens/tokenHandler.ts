@@ -1,4 +1,4 @@
-import {define, inject, singleton, injectAlias} from "appolo-engine";
+import {define, inject, singleton} from "@appolo/inject";
 import {IOptions} from "../interfaces/IOptions";
 import {AuthenticateHandler} from "../auth/authenticateHandler";
 import {TokensHelper} from "./tokensHelper";

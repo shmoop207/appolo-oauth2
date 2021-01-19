@@ -9,7 +9,6 @@ import {
     IAuthenticationModel,
     IClient, Falsey, IUser, IToken, GrantType, Utils
 } from "../index";
-import {Promises} from "appolo-utils";
 import {TestModel} from "./testModel";
 
 let should = require('chai').should();

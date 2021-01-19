@@ -1,4 +1,4 @@
-import {alias, define, inject, singleton} from "appolo-engine";
+import {define, inject, singleton,alias} from "@appolo/inject";
 import {IOptions} from "../interfaces/IOptions";
 import {Falsey, IPasswordModel} from "../interfaces/IModel";
 import {InvalidGrantError} from "../common/errors/invalidGrantError";
@@ -10,7 +10,7 @@ import {IToken} from "../interfaces/IToken";
 import {IUser} from "../interfaces/IUser";
 import {IGrantHandler} from "../interfaces/IGrantHandler";
 import {InvalidRequestError} from "../common/errors/invalidRequestError";
-import {Promises} from "appolo-utils";
+import {Promises} from "@appolo/utils";
 import {GrantType} from "../common/enums";
 import {ClientHandler} from "../clients/clientHandler";
 import {ILoginParams} from "../interfaces/ITokenParams";

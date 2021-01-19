@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientHandler = void 0;
 const tslib_1 = require("tslib");
-const appolo_engine_1 = require("appolo-engine");
+const inject_1 = require("@appolo/inject");
 const invalidClientError_1 = require("../common/errors/invalidClientError");
 const invalidRequestError_1 = require("../common/errors/invalidRequestError");
 const serverError_1 = require("../common/errors/serverError");
@@ -38,11 +38,11 @@ let ClientHandler = class ClientHandler {
     }
 };
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], ClientHandler.prototype, "options", void 0);
 ClientHandler = tslib_1.__decorate([
-    appolo_engine_1.define(),
-    appolo_engine_1.singleton()
+    inject_1.define(),
+    inject_1.singleton()
 ], ClientHandler);
 exports.ClientHandler = ClientHandler;
 //# sourceMappingURL=clientHandler.js.map

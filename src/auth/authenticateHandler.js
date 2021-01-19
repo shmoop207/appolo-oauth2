@@ -2,13 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthenticateHandler = void 0;
 const tslib_1 = require("tslib");
-const appolo_engine_1 = require("appolo-engine");
-const appolo_utils_1 = require("appolo-utils");
+const inject_1 = require("@appolo/inject");
+const utils_1 = require("@appolo/utils");
 const serverError_1 = require("../common/errors/serverError");
 const invalidTokenError_1 = require("../common/errors/invalidTokenError");
 const unauthorizedRequestError_1 = require("../common/errors/unauthorizedRequestError");
 const insufficientScopeError_1 = require("../common/errors/insufficientScopeError");
-const appolo_utils_2 = require("appolo-utils");
 let AuthenticateHandler = class AuthenticateHandler {
     async getToken(opts) {
         if (!opts.token) {
@@ -31,7 +30,7 @@ let AuthenticateHandler = class AuthenticateHandler {
     }
     async _getToken(opts) {
         let promise = this.options.model.getAccessToken(opts.token);
-        let [err, accessToken] = await appolo_utils_1.Promises.to(promise);
+        let [err, accessToken] = await utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError('Server error: `failed to get token', err);
         }
@@ -45,7 +44,7 @@ let AuthenticateHandler = class AuthenticateHandler {
             return;
         }
         let promise = this.options.model.verifyScope(token, scopes);
-        let [err, result] = await appolo_utils_1.Promises.to(promise);
+        let [err, result] = await utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError('Server error: `failed to` must be a Date instance', err);
         }
@@ -70,21 +69,21 @@ let AuthenticateHandler = class AuthenticateHandler {
         if (diff >= (this.options.bumpLifeTimeMinDiff * 1000)) {
             token.accessTokenLifetime && (token.accessTokenExpiresAt = newAccessTokenLifetime);
             token.refreshTokenLifetime && (token.refreshTokenExpiresAt = this.tokensHelper.getExpireDate(token.refreshTokenLifetime));
-            let refresh = appolo_utils_2.Objects.omit(token, "accessTokenLifetime", "accessToken", "accessTokenExpiresAt");
+            let refresh = utils_1.Objects.omit(token, "accessTokenLifetime", "accessToken", "accessTokenExpiresAt");
             [token] = await this.tokensHelper.saveTokens(token, refresh, token.client, token.user);
         }
         return token;
     }
 };
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], AuthenticateHandler.prototype, "options", void 0);
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], AuthenticateHandler.prototype, "tokensHelper", void 0);
 AuthenticateHandler = tslib_1.__decorate([
-    appolo_engine_1.define(),
-    appolo_engine_1.singleton()
+    inject_1.define(),
+    inject_1.singleton()
 ], AuthenticateHandler);
 exports.AuthenticateHandler = AuthenticateHandler;
 //# sourceMappingURL=authenticateHandler.js.map

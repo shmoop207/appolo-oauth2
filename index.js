@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createOAuth2Server = exports.UnauthorizedRequestError = exports.UnauthorizedClientError = exports.ServerError = exports.InvalidTokenError = exports.InvalidScopeError = exports.InvalidRequestError = exports.InvalidGrantError = exports.InvalidClientError = exports.InsufficientScopeError = exports.Utils = exports.GrantType = exports.OAuth2Server = void 0;
 const enums_1 = require("./src/common/enums");
 Object.defineProperty(exports, "GrantType", { enumerable: true, get: function () { return enums_1.GrantType; } });
-const appolo_engine_1 = require("appolo-engine");
+const engine_1 = require("@appolo/engine");
 const defaults_1 = require("./src/common/defaults");
 const oAuth2Server_1 = require("./src/oAuth2Server");
 Object.defineProperty(exports, "OAuth2Server", { enumerable: true, get: function () { return oAuth2Server_1.OAuth2Server; } });
@@ -28,7 +28,7 @@ Object.defineProperty(exports, "UnauthorizedClientError", { enumerable: true, ge
 const unauthorizedRequestError_1 = require("./src/common/errors/unauthorizedRequestError");
 Object.defineProperty(exports, "UnauthorizedRequestError", { enumerable: true, get: function () { return unauthorizedRequestError_1.UnauthorizedRequestError; } });
 async function createOAuth2Server(options) {
-    let app = appolo_engine_1.createApp({ root: __dirname });
+    let app = engine_1.createApp({ root: __dirname });
     app.injector.addObject("options", Object.assign({}, defaults_1.Defaults, options));
     await app.launch();
     let server = app.injector.get(oAuth2Server_1.OAuth2Server, [options]);

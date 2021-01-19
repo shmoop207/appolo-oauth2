@@ -1,12 +1,11 @@
-import {define, inject, singleton} from "appolo-engine";
-import {Guid} from "appolo-utils";
+import {define, inject, singleton} from "@appolo/inject";
+import {Guid,Promises} from "@appolo/utils";
 import {IOptions} from "../interfaces/IOptions";
 import {IClient} from "../interfaces/IClient";
 import {IUser} from "../interfaces/IUser";
 import {IRefreshToken, IToken} from "../interfaces/IToken";
 import {Falsey, IPasswordModel, IRefreshTokenModel} from "../interfaces/IModel";
 import {ServerError} from "../common/errors/serverError";
-import {Promises} from "appolo-utils";
 import {InvalidGrantError} from "../common/errors/invalidGrantError";
 import {ClientHandler} from "../clients/clientHandler";
 import {UnauthorizedClientError} from "../common/errors/unauthorizedClientError";

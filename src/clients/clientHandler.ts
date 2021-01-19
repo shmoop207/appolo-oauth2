@@ -1,4 +1,4 @@
-import {define, inject, singleton} from "appolo-engine";
+import {define, inject, singleton} from "@appolo/inject";
 import {IClient} from "../interfaces/IClient";
 import {IOptions} from "../interfaces/IOptions";
 import {InvalidClientError} from "../common/errors/invalidClientError";

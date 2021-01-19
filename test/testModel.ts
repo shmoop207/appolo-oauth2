@@ -8,7 +8,7 @@ import {
     IRefreshTokenModel,
     IRefreshToken
 } from "../index";
-import {Guid} from "appolo-utils";
+import {Guid} from "@appolo/utils";
 
 
 export class TestModel implements IPasswordModel, IAuthenticationModel, IRefreshTokenModel {

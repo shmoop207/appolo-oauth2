@@ -2,10 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokensHelper = void 0;
 const tslib_1 = require("tslib");
-const appolo_engine_1 = require("appolo-engine");
-const appolo_utils_1 = require("appolo-utils");
+const inject_1 = require("@appolo/inject");
+const utils_1 = require("@appolo/utils");
 const serverError_1 = require("../common/errors/serverError");
-const appolo_utils_2 = require("appolo-utils");
 const invalidGrantError_1 = require("../common/errors/invalidGrantError");
 let TokensHelper = class TokensHelper {
     async generateAccessToken(opts) {
@@ -13,14 +12,14 @@ let TokensHelper = class TokensHelper {
         if (model.generateAccessToken) {
             token = await model.generateAccessToken(opts.client, opts.user, opts.scopes);
         }
-        return token || appolo_utils_1.Guid.guid();
+        return token || utils_1.Guid.guid();
     }
     async generateRefreshToken(opts) {
         let token, model = this.options.model;
         if (model.generateRefreshToken) {
             token = await model.generateRefreshToken(opts.client, opts.user, opts.scopes);
         }
-        return token || appolo_utils_1.Guid.guid();
+        return token || utils_1.Guid.guid();
     }
     getAccessTokenLifetime(accessTokenLifetime, client) {
         return (accessTokenLifetime || client.accessTokenLifetime || this.options.accessTokenLifetime);
@@ -90,7 +89,7 @@ let TokensHelper = class TokensHelper {
     }
     async saveAccessToken(token, client, user) {
         let promise = this.options.model.saveAccessToken(Object.assign({}, token), Object.assign({}, client), Object.assign({}, user));
-        let [err, validToken] = await appolo_utils_2.Promises.to(promise);
+        let [err, validToken] = await utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
@@ -101,7 +100,7 @@ let TokensHelper = class TokensHelper {
     }
     async saveTokenRefresh(token, client, user) {
         let promise = this.options.model.saveRefreshToken(Object.assign({}, token), Object.assign({}, client), Object.assign({}, user));
-        let [err, validToken] = await appolo_utils_2.Promises.to(promise);
+        let [err, validToken] = await utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
@@ -113,7 +112,7 @@ let TokensHelper = class TokensHelper {
     async revokeRefreshToken(token) {
         let model = this.options.model;
         let promise = model.revokeRefreshToken(token);
-        let [err, result] = await appolo_utils_2.Promises.to(promise);
+        let [err, result] = await utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
@@ -124,7 +123,7 @@ let TokensHelper = class TokensHelper {
     async revokeAccessToken(token) {
         let model = this.options.model;
         let promise = model.revokeAccessToken(token);
-        let [err, result] = await appolo_utils_2.Promises.to(promise);
+        let [err, result] = await utils_1.Promises.to(promise);
         if (err) {
             throw new serverError_1.ServerError(`server error: ${(err || "").toString()}`, err);
         }
@@ -134,17 +133,17 @@ let TokensHelper = class TokensHelper {
     }
 };
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], TokensHelper.prototype, "options", void 0);
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], TokensHelper.prototype, "clientHandler", void 0);
 tslib_1.__decorate([
-    appolo_engine_1.inject()
+    inject_1.inject()
 ], TokensHelper.prototype, "authenticateHandler", void 0);
 TokensHelper = tslib_1.__decorate([
-    appolo_engine_1.define(),
-    appolo_engine_1.singleton()
+    inject_1.define(),
+    inject_1.singleton()
 ], TokensHelper);
 exports.TokensHelper = TokensHelper;
 //# sourceMappingURL=tokensHelper.js.map

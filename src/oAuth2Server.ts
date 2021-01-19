@@ -1,4 +1,4 @@
-import {define, inject, initMethod} from 'appolo-engine';
+import {define, inject, init} from '@appolo/inject';
 import { ILoginParams, IRefreshParams} from "./interfaces/ITokenParams";
 import {IToken} from "./interfaces/IToken";
 import {TokenHandler} from "./tokens/tokenHandler";
@@ -15,7 +15,7 @@ export class OAuth2Server {
     @inject() private passwordGruntHandler: PasswordGruntHandler;
     @inject() private refreshGrantHandler: RefreshGrantHandler;
 
-    @initMethod()
+    @init()
     private _initialize() {
 
     }

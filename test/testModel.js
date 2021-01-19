@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestModel = void 0;
-const appolo_utils_1 = require("appolo-utils");
+const utils_1 = require("@appolo/utils");
 class TestModel {
     constructor() {
         this._tokens = {};
@@ -31,10 +31,10 @@ class TestModel {
         return token;
     }
     async generateAccessToken(client, user, scope) {
-        return appolo_utils_1.Guid.guid();
+        return utils_1.Guid.guid();
     }
     async generateRefreshToken(client, user, scope) {
-        return appolo_utils_1.Guid.guid();
+        return utils_1.Guid.guid();
     }
     async getAccessToken(accessToken) {
         return this._tokens[accessToken];
